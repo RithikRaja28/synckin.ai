@@ -1,6 +1,16 @@
 import React, { useState } from "react";
 import { Nav } from "react-bootstrap";
-import { FaHome, FaDollarSign, FaBell, FaCog, FaBars } from "react-icons/fa";
+import {
+  FaHome,
+  FaDollarSign,
+  FaBox,
+  FaTasks,
+  FaUser,
+  FaCog,
+  FaBell,
+  FaBars,
+  FaCalendar,
+} from "react-icons/fa";
 import { NavLink } from "react-router-dom";
 
 const Sidebar = () => {
@@ -48,11 +58,31 @@ const Sidebar = () => {
         }}
       >
         <Nav defaultActiveKey="/dashboard" className="flex-column">
-          <NavLink to="/" className="nav-link text-info">
+          <NavLink to="/dashboard" className="nav-link text-info">
             <FaHome className="me-2" /> Dashboard
           </NavLink>
-          <NavLink to="/expenses" className="nav-link text-light">
+          <NavLink to="/dashboard/expenses" className="nav-link text-light">
             <FaDollarSign className="me-2" /> Expense Tracker
+          </NavLink>
+          <NavLink to="/dashboard/inventory" className="nav-link text-light">
+            <FaBox className="me-2" /> Inventory
+          </NavLink>
+          <NavLink to="/dashboard/tasks" className="nav-link text-light">
+            <FaTasks className="me-2" /> Tasks
+          </NavLink>
+
+          <NavLink
+            to="/dashboard/notifications"
+            className="nav-link text-light"
+          >
+            <FaCalendar className="me-2" /> Budget Planning
+          </NavLink>
+          <NavLink to="/dashboard/family" className="nav-link text-light">
+            <FaUser className="me-2" /> Family Members
+          </NavLink>
+
+          <NavLink to="/dashboard/settings" className="nav-link text-light">
+            <FaCog className="me-2" /> Settings
           </NavLink>
           <NavLink
             to="/dashboard/notifications"
@@ -60,9 +90,7 @@ const Sidebar = () => {
           >
             <FaBell className="me-2" /> Notifications
           </NavLink>
-          <NavLink to="/dashboard/settings" className="nav-link text-light">
-            <FaCog className="me-2" /> Settings
-          </NavLink>
+          
         </Nav>
       </div>
 
