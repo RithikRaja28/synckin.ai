@@ -5,6 +5,7 @@ import Header from "./utils/Header";
 import ExpenseTracker from "../features/ExpenseTracker";
 import "./Dashboard.css";
 import { AuthContext } from "../../context/AuthContext";
+import InventoryManager from "../InventoryManagement/InventorySystem";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
@@ -37,7 +38,7 @@ const Dashboard = () => {
                 </div>
               }
             />
-            <Route path="/expenses" element={<ExpenseTracker />} />
+            <Route path="/inventorytracker" element={<InventoryManager />} />
           </Routes>
         </div>
       </div>

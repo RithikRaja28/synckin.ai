@@ -17,7 +17,8 @@ const Header = () => {
       }}
     >
       <Navbar.Brand href="/" className="text-info">
-        🤖 Synckin.ai
+        <img src=".\favicon-synckin.png" alt="" style={{ width: "40px" }}  />{" "}
+        Synckin.ai
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">

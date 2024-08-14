@@ -17,7 +17,7 @@ const InventoryItemSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-  dueData: {
+  dueDate: {
     type: Date,
     required: true,
   },

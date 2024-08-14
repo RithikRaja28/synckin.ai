@@ -64,7 +64,7 @@ const Sidebar = () => {
           <NavLink to="/dashboard/expenses" className="nav-link text-light">
             <FaDollarSign className="me-2" /> Expense Tracker
           </NavLink>
-          <NavLink to="/dashboard/inventory" className="nav-link text-light">
+          <NavLink to="/dashboard/inventorytracker" className="nav-link text-light">
             <FaBox className="me-2" /> Inventory
           </NavLink>
           <NavLink to="/dashboard/tasks" className="nav-link text-light">
@@ -90,7 +90,6 @@ const Sidebar = () => {
           >
             <FaBell className="me-2" /> Notifications
           </NavLink>
-          
         </Nav>
       </div>
 
