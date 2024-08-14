@@ -1,21 +1,28 @@
 import React, { useState, useContext } from "react";
 import { Form, Button, Container, Row, Col, Card } from "react-bootstrap";
 import { FaUser, FaEnvelope, FaLock, FaUserPlus } from "react-icons/fa";
-import AuthContext from "../../context/AuthContext";
+import { AuthContext } from "../../context/AuthContext";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { register } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
       await register(username, email, password);
+      console.log("Registration successful");
+      navigate("/dashboard");
       // Redirect to dashboard or another page after successful signup
     } catch (err) {
-      console.error("Registration failed",err);
+      console.error(
+        "Registration failed",
+        err.response ? err.response.data : err.message
+      );
     }
   };
 

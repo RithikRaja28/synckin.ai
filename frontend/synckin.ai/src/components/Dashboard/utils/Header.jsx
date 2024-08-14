@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navbar, Nav, Form, FormControl, Dropdown } from "react-bootstrap";
 import { FaBell, FaUserCircle } from "react-icons/fa";
-
+import { AuthContext } from "../../../context/AuthContext";
 const Header = () => {
+  const { logout } = useContext(AuthContext);
   return (
     <Navbar
       bg="dark"
@@ -45,7 +46,11 @@ const Header = () => {
                 Settings
               </Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#logout" className="text-light">
+              <Dropdown.Item
+                href="#logout"
+                className="text-light"
+                onClick={logout}
+              >
                 Logout
               </Dropdown.Item>
             </Dropdown.Menu>
