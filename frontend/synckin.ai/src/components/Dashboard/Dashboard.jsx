@@ -1,11 +1,21 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useContext, useEffect } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import Sidebar from "./utils/Sidebar";
 import Header from "./utils/Header";
 import ExpenseTracker from "../features/ExpenseTracker";
 import "./Dashboard.css";
-
+import { AuthContext } from "../../context/AuthContext";
+import InventoryManager from "../InventoryManagement/InventorySystem";
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { auth } = useContext(AuthContext);
+  console.log(auth);
+  useEffect(() => {
+    if (!auth.isAuthenticated) {
+      navigate("/login");
+      console.log("User is not authenticated. Redirecting to login...");
+    }
+  }, [auth.isAuthenticated, navigate]);
   return (
     <div className="d-flex vh-100 w-100">
       <Sidebar />
@@ -19,13 +29,16 @@ const Dashboard = () => {
         <Header />
         <div className="content p-4">
           <Routes>
-            <Route path="/" element={<div>Welcome to the Dashboard</div>} />
             <Route
-              path="/expenses"
+              path="/"
               element={
-                <ExpenseTracker />
+                <div>
+                  <h1>Welcome to the Dashboard</h1>{" "}
+                  {auth.user && <p>Hello, {auth.user.username}</p>}
+                </div>
               }
             />
+            <Route path="/inventorytracker" element={<InventoryManager />} />
           </Routes>
         </div>
       </div>

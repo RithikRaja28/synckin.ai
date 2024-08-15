@@ -1,9 +1,10 @@
 import React, { createContext, useState, useEffect } from "react";
 import axios from "axios";
 
+// Create AuthContext
 const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
+const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     isAuthenticated: false,
     token: null,
@@ -12,12 +13,25 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
+    
     if (token) {
-      setAuth({
-        isAuthenticated: true,
-        token,
-        user: null, // You can set user data here if needed
-      });
+      // Set the token in the request header
+      axios
+        .get("http://localhost:5000/auth/user", {
+          headers: { "x-auth-token": token },
+        })
+        .then((res) => {
+          setAuth({
+            isAuthenticated: true,
+            token,
+            user: res.data,
+          });
+          console.log("User details fetched: ", res.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching user details: ", err);
+          localStorage.removeItem("token"); // Remove the token if fetching fails
+        });
     }
   }, []);
 
@@ -28,10 +42,14 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       localStorage.setItem("token", res.data.token);
+      // Fetch user details immediately after login
+      const userResponse = await axios.get("http://localhost:5000/auth/user", {
+        headers: { "x-auth-token": res.data.token },
+      });
       setAuth({
         isAuthenticated: true,
         token: res.data.token,
-        user: null,
+        user: userResponse.data, // Set the user after logging in
       });
       console.log("Login successful");
     } catch (err) {
@@ -48,14 +66,17 @@ export const AuthProvider = ({ children }) => {
         password,
       });
       localStorage.setItem("token", res.data.token);
+      // Fetch user details immediately after registration
+      const userResponse = await axios.get("http://localhost:5000/auth/user", {
+        headers: { "x-auth-token": res.data.token },
+      });
       setAuth({
         isAuthenticated: true,
         token: res.data.token,
-        user: null,
+        user: userResponse.data, // Set the user after registration
       });
     } catch (err) {
       console.error("Registration error:", err);
-    
     }
   };
 
@@ -75,4 +96,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-export default AuthContext;
+// Export both AuthContext and AuthProvider
+export { AuthContext, AuthProvider };

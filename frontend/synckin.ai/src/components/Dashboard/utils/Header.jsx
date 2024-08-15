@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Navbar, Nav, Form, FormControl, Dropdown } from "react-bootstrap";
 import { FaBell, FaUserCircle } from "react-icons/fa";
-
+import { AuthContext } from "../../../context/AuthContext";
 const Header = () => {
+  const { logout } = useContext(AuthContext);
   return (
     <Navbar
       bg="dark"
@@ -16,7 +17,8 @@ const Header = () => {
       }}
     >
       <Navbar.Brand href="/" className="text-info">
-        🤖 Synckin.ai
+        <img src=".\favicon-synckin.png" alt="" style={{ width: "40px" }}  />{" "}
+        Synckin.ai
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
@@ -45,7 +47,11 @@ const Header = () => {
                 Settings
               </Dropdown.Item>
               <Dropdown.Divider />
-              <Dropdown.Item href="#logout" className="text-light">
+              <Dropdown.Item
+                href="#logout"
+                className="text-light"
+                onClick={logout}
+              >
                 Logout
               </Dropdown.Item>
             </Dropdown.Menu>

@@ -11,10 +11,11 @@ import {
   FaBars,
   FaCalendar,
 } from "react-icons/fa";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const toggleSidebar = () => {
     setIsOpen(!isOpen);
@@ -46,7 +47,7 @@ const Sidebar = () => {
         }`}
         style={{
           transition: "all 0.3s ease-in-out",
-          width: isOpen ? "250px" : "250px",
+          width: "250px",
           marginTop: isOpen ? "50px" : "0px",
           backgroundColor: "#1a1a1a",
           boxShadow: "2px 0 6px rgba(0, 0, 0, 0.5)",
@@ -58,39 +59,86 @@ const Sidebar = () => {
         }}
       >
         <Nav defaultActiveKey="/dashboard" className="flex-column">
-          <NavLink to="/dashboard" className="nav-link text-info">
+          <NavLink
+            to="/dashboard"
+            className={`nav-link ${
+              location.pathname === "/dashboard"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
             <FaHome className="me-2" /> Dashboard
           </NavLink>
-          <NavLink to="/dashboard/expenses" className="nav-link text-light">
+          <NavLink
+            to="/dashboard/expenses"
+            className={`nav-link ${
+              location.pathname === "/dashboard/expenses"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
             <FaDollarSign className="me-2" /> Expense Tracker
           </NavLink>
-          <NavLink to="/dashboard/inventory" className="nav-link text-light">
+          <NavLink
+            to="/dashboard/inventorytracker"
+            className={`nav-link ${
+              location.pathname === "/dashboard/inventorytracker"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
             <FaBox className="me-2" /> Inventory
           </NavLink>
-          <NavLink to="/dashboard/tasks" className="nav-link text-light">
+          <NavLink
+            to="/dashboard/tasks"
+            className={`nav-link ${
+              location.pathname === "/dashboard/tasks"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
             <FaTasks className="me-2" /> Tasks
           </NavLink>
-
           <NavLink
-            to="/dashboard/notifications"
-            className="nav-link text-light"
+            to="/dashboard/budget-planning"
+            className={`nav-link ${
+              location.pathname === "/dashboard/budget-planning"
+                ? "text-info active"
+                : "text-light"
+            }`}
           >
             <FaCalendar className="me-2" /> Budget Planning
           </NavLink>
-          <NavLink to="/dashboard/family" className="nav-link text-light">
+          <NavLink
+            to="/dashboard/family"
+            className={`nav-link ${
+              location.pathname === "/dashboard/family"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
             <FaUser className="me-2" /> Family Members
           </NavLink>
-
-          <NavLink to="/dashboard/settings" className="nav-link text-light">
+          <NavLink
+            to="/dashboard/settings"
+            className={`nav-link ${
+              location.pathname === "/dashboard/settings"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
             <FaCog className="me-2" /> Settings
           </NavLink>
           <NavLink
             to="/dashboard/notifications"
-            className="nav-link text-light"
+            className={`nav-link ${
+              location.pathname === "/dashboard/notifications"
+                ? "text-info active"
+                : "text-light"
+            }`}
           >
             <FaBell className="me-2" /> Notifications
           </NavLink>
-          
         </Nav>
       </div>
 

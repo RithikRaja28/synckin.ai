@@ -25,13 +25,13 @@ router.post("/add", async (req, res) => {
     console.log("Invalid token");
   }
 
-  const { name, quantity, description, duedate } = req.body;
+  const { name, quantity, description, dueDate } = req.body;
   try {
     const newItem = new InventoryItem({
       name,
       quantity,
       description,
-      duedate,
+      dueDate,
       userId,
     });
 
@@ -65,12 +65,12 @@ router.put('/update/:id', async (req, res) => {
         return res.status(401).json({ msg: 'No token or invalid token, authorization denied' });
     }
 
-    const { name, quantity, description, dueData } = req.body;
+    const { name, quantity, description, dueDate } = req.body;
 
     try {
         const item = await InventoryItem.findOneAndUpdate(
             { _id: req.params.id, userId },
-            { $set: { name, quantity, description, dueData } },
+            { $set: { name, quantity, description, dueDate } },
             { new: true }
         );
 

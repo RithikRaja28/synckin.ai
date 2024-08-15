@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const InventoryManager = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
@@ -7,7 +8,7 @@ const InventoryManager = () => {
     name: "",
     quantity: "",
     description: "",
-    dueData: "",
+    dueDate: "",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingItemId, setEditingItemId] = useState(null);
@@ -42,7 +43,7 @@ const InventoryManager = () => {
         }
       );
       setInventoryItems([...inventoryItems, response.data]);
-      setNewItem({ name: "", quantity: "", description: "", dueData: "" });
+      setNewItem({ name: "", quantity: "", description: "", dueDate: "" });
     } catch (error) {
       console.error("Error adding inventory item:", error.response.data);
     }
@@ -65,7 +66,7 @@ const InventoryManager = () => {
       name: item.name,
       quantity: item.quantity,
       description: item.description,
-      dueData: item.dueData,
+      dueDate: item.dueDate,
     });
     setEditingItemId(item._id);
     setIsEditing(true);
@@ -86,7 +87,7 @@ const InventoryManager = () => {
           item._id === editingItemId ? response.data : item
         )
       );
-      setNewItem({ name: "", quantity: "", description: "", dueData: "" });
+      setNewItem({ name: "", quantity: "", description: "", dueDate: "" });
       setIsEditing(false);
       setEditingItemId(null);
     } catch (error) {
@@ -95,51 +96,102 @@ const InventoryManager = () => {
   };
 
   return (
-    <div>
-      <h2>Inventory Management</h2>
-      <div>
-        <h3>{isEditing ? "Edit Item" : "Add New Item"}</h3>
-        <input
-          type="text"
-          placeholder="Name"
-          value={newItem.name}
-          onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-        />
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={newItem.quantity}
-          onChange={(e) => setNewItem({ ...newItem, quantity: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={newItem.description}
-          onChange={(e) =>
-            setNewItem({ ...newItem, description: e.target.value })
-          }
-        />
-        <input
-          type="date"
-          placeholder="Due Date"
-          value={newItem.dueData}
-          onChange={(e) => setNewItem({ ...newItem, dueData: e.target.value })}
-        />
-        <button onClick={isEditing ? handleUpdateItem : handleAddItem}>
-          {isEditing ? "Update Item" : "Add Item"}
-        </button>
+    <div className="container mt-5">
+      <div className="row">
+        <div className="col-md-4">
+          <div className="card shadow-lg mb-4">
+            <div className="card-body">
+              <h4 className="text-muted">
+                {isEditing ? "Edit Item" : "Add New Item"}
+              </h4>
+              <div className="form-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Name"
+                  value={newItem.name}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, name: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group mb-3">
+                <input
+                  type="number"
+                  className="form-control"
+                  placeholder="Quantity"
+                  value={newItem.quantity}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, quantity: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Description"
+                  value={newItem.description}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, description: e.target.value })
+                  }
+                />
+              </div>
+              <div className="form-group mb-3">
+                <input
+                  type="date"
+                  className="form-control"
+                  value={newItem.dueDate}
+                  onChange={(e) =>
+                    setNewItem({ ...newItem, dueDate: e.target.value })
+                  }
+                />
+              </div>
+              <button
+                className="btn btn-primary w-100"
+                onClick={isEditing ? handleUpdateItem : handleAddItem}
+              >
+                {isEditing ? "Update Item" : "Add Item"}
+              </button>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-8">
+          <div className="card shadow-lg">
+            <div className="card-body">
+              <h4 className="text-muted">Your Inventory Items</h4>
+              <ul className="list-group">
+                {inventoryItems.map((item) => (
+                  <li
+                    key={item._id}
+                    className="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <div>
+                      <strong>{item.name}</strong> - {item.quantity} -{" "}
+                      {item.description} - Due:{" "}
+                      {new Date(item.dueDate).toLocaleDateString()}
+                    </div>
+                    <div>
+                      <button
+                        className="btn btn-warning btn-sm me-2"
+                        onClick={() => handleEditItem(item)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDeleteItem(item._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-      <h3>Inventory Items</h3>
-      <ul>
-        {inventoryItems.map((item) => (
-          <li key={item._id}>
-            {item.name} - {item.quantity} - {item.description} - Due:{" "}
-            {new Date(item.dueData).toLocaleDateString()}
-            <button onClick={() => handleEditItem(item)}>Edit</button>
-            <button onClick={() => handleDeleteItem(item._id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
     </div>
   );
 };
