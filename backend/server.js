@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const auth = require("./routes/auth");
 const inventory = require("./routes/inventory");
+const tasks = require("./routes/tasks");
 
 const app = express();
 
@@ -28,3 +29,4 @@ app.listen(PORT, ()=> console.log("Successfully connected to ", PORT));
 
 app.use("/auth",auth);
 app.use("/api/inventory", inventory);
+app.use("/api/tasks", tasks);
