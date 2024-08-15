@@ -2,10 +2,11 @@ import React, { useContext, useEffect } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Sidebar from "./utils/Sidebar";
 import Header from "./utils/Header";
-import ExpenseTracker from "../features/ExpenseTracker";
+
 import "./Dashboard.css";
 import { AuthContext } from "../../context/AuthContext";
 import InventoryManager from "../InventoryManagement/InventorySystem";
+import TaskManager from "../TaskManagement/TaskManager";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
@@ -39,6 +40,7 @@ const Dashboard = () => {
               }
             />
             <Route path="/inventorytracker" element={<InventoryManager />} />
+            <Route path="/taskmanager" element={<TaskManager/>}/>
           </Routes>
         </div>
       </div>

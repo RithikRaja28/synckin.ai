@@ -90,7 +90,7 @@ const Sidebar = () => {
             <FaBox className="me-2" /> Inventory
           </NavLink>
           <NavLink
-            to="/dashboard/tasks"
+            to="/dashboard/taskmanager"
             className={`nav-link ${
               location.pathname === "/dashboard/tasks"
                 ? "text-info active"
