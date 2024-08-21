@@ -92,7 +92,7 @@ const Sidebar = () => {
           <NavLink
             to="/dashboard/taskmanager"
             className={`nav-link ${
-              location.pathname === "/dashboard/tasks"
+              location.pathname === "/dashboard/taskmanager"
                 ? "text-info active"
                 : "text-light"
             }`}

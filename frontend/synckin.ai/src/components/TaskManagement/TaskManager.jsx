@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Import icons from react-icons
-
+import "./TaskManager.css";
 const TaskManager = () => {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState({
@@ -107,11 +107,11 @@ const TaskManager = () => {
   };
 
   return (
-    <div className="container mt-5">
+    <div className="container-custom mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="text-muted">Task Manager</h4>
+        <h4 className="header-custom">Your Tasks</h4>
         <button
-          className="btn btn-success"
+          className="btn btn-primary btn-custom rounded-pill"
           onClick={() => setShowForm(!showForm)}
         >
           <FaPlus /> {showForm ? "Hide Form" : "Add Task"}
@@ -120,8 +120,8 @@ const TaskManager = () => {
 
       {showForm && (
         <div className="card shadow-lg mb-4 p-4">
-          <div className="card-body">
-            <h4 className="text-muted text-center">
+          <div className="card-body card-custom shadow-lg mb-4 p-4">
+            <h4 className="header-custom text-center">
               {isEditing ? "Edit Task" : "Add New Task"}
             </h4>
             <div className="form-group mb-3">
@@ -183,14 +183,14 @@ const TaskManager = () => {
               </select>
             </div>
             <button
-              className="btn btn-primary btn-block mb-2"
+              className="btn btn-primary btn-block btn-custom mb-2"
               onClick={isEditing ? handleUpdateTask : handleAddTask}
             >
               {isEditing ? "Update Task" : "Add Task"}
             </button>
             {isEditing && (
               <button
-                className="btn btn-secondary btn-block"
+                className="btn btn-secondary btn-block btn-custom mb-2 ms-2"
                 onClick={resetTaskForm}
               >
                 Cancel
@@ -203,30 +203,33 @@ const TaskManager = () => {
       <div className="row">
         {["Pending", "In Progress", "Completed"].map((status) => (
           <div className="col-md-4 mb-4" key={status}>
-            <div className="card shadow-lg h-100">
-              <div className="card-header text-center bg-light">
-                <h5 className="text-muted">{status}</h5>
+            <div className="card card-custom shadow-lg h-100">
+              <div className="card-header card-header-custom text-center bg-light">
+                <h5 className="header-custom">{status}</h5>
               </div>
               <ul className="list-group list-group-flush">
                 {tasks
                   .filter((task) => task.status === status)
                   .map((task) => (
-                    <li key={task._id} className="list-group-item">
-                      <h5>{task.taskName}</h5>
-                      <p>{task.description}</p>
-                      <p>
+                    <li
+                      key={task._id}
+                      className="list-group-item list-group-item-custom"
+                    >
+                      <h5 className="task-title">{task.taskName}</h5>
+                      <p className="task-details">{task.description}</p>
+                      <p className="task-details">
                         Due: {new Date(task.dueDate).toLocaleDateString()} |
                         Priority: {task.priority} | Status: {task.status}
                       </p>
-                      <div className="d-flex justify-content-between">
+                      <div className="task-actions">
                         <button
-                          className="btn btn-secondary btn-sm"
+                          className="btn btn-edit-custom btn-sm"
                           onClick={() => handleEditTask(task)}
                         >
                           <FaEdit /> Edit
                         </button>
                         <button
-                          className="btn btn-danger btn-sm"
+                          className="btn btn-delete-custom btn-sm ms-2"
                           onClick={() => handleDeleteTask(task._id)}
                         >
                           <FaTrash /> Delete
@@ -236,7 +239,7 @@ const TaskManager = () => {
                   ))}
                 {tasks.filter((task) => task.status === status).length ===
                   0 && (
-                  <li className="list-group-item text-center">
+                  <li className="list-group-item list-group-item-custom text-center no-tasks">
                     No tasks in this category.
                   </li>
                 )}
