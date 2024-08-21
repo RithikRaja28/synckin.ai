@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-
+import { FaEdit, FaTrash } from "react-icons/fa";
 const InventoryManager = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [newItem, setNewItem] = useState({
@@ -148,7 +148,7 @@ const InventoryManager = () => {
                 />
               </div>
               <button
-                className="btn btn-primary w-100"
+                className="btn btn-primary w-100 mt-3 rounded-pill"
                 onClick={isEditing ? handleUpdateItem : handleAddItem}
               >
                 {isEditing ? "Update Item" : "Add Item"}
@@ -173,16 +173,17 @@ const InventoryManager = () => {
                     </div>
                     <div>
                       <button
-                        className="btn btn-warning btn-sm me-2"
+                        className="btn btn-sm me-2"
+                        style={{ backgroundColor: "#17a2b8", color: "#fff" }}
                         onClick={() => handleEditItem(item)}
                       >
-                        Edit
+                        <FaEdit /> Edit
                       </button>
                       <button
                         className="btn btn-danger btn-sm"
                         onClick={() => handleDeleteItem(item._id)}
                       >
-                        Delete
+                       <FaTrash/> Delete
                       </button>
                     </div>
                   </li>

@@ -1,0 +1,142 @@
+
+.container-custom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header-custom {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700;
+  color: #333;
+}
+
+.card-custom {
+  border-radius: 10px;
+  background-color: #ffffff;
+  border: none;
+  transition: transform 0.2s;
+}
+
+.card-custom:hover {
+  transform: scale(1.02);
+}
+
+.card-header-custom {
+  background-color: #ced4da;
+  color: #ffffff;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 10px;
+}
+
+.list-group-item-custom {
+  padding: 15px 20px;
+  background-color: #f8f9fa;
+  border: none;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s;
+}
+
+.list-group-item-custom:hover {
+  background-color: #e2e6ea;
+}
+
+.task-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+}
+
+.task-details {
+  color: #6c757d;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.task-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 25px;
+}
+
+.btn-custom {
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 5px;
+}
+
+.btn-edit-custom {
+  background-color: #17a2b8;
+  color: #ffffff;
+}
+
+.btn-edit-custom:hover {
+  background-color: #138496;
+  color: #ffffff;
+}
+
+.btn-delete-custom {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+.btn-delete-custom:hover {
+  background-color: #c82333;
+  color: #ffffff;
+}
+
+.no-tasks {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.form-control {
+  border-radius: 5px;
+  border: 1px solid #ced4da;
+  font-size: 14px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+  border-color: #004085;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  border-color: #6c757d;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+  border-color: #4e555b;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.btn-success:hover {
+  background-color: #218838;
+  border-color: #1e7e34;
+}
