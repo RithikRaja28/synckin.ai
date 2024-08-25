@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const Income = require("../models/Income")
+const Income = require("../models/Income");
 
 // Verify JWT Token
 const verifyToken = (req) => {
