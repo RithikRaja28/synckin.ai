@@ -3,6 +3,7 @@ import axios from "axios";
 import Chart from "chart.js/auto";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+
 const IncomePage = () => {
   const [incomes, setIncomes] = useState([]);
   const [formData, setFormData] = useState({
@@ -16,7 +17,6 @@ const IncomePage = () => {
   const chartInstanceRef = useRef(null);
 
   useEffect(() => {
-    // Fetch incomes from the API
     axios
       .get("http://localhost:5000/api/income/show", {
         headers: { "x-auth-token": localStorage.getItem("token") },
@@ -31,12 +31,10 @@ const IncomePage = () => {
   }, []);
 
   useEffect(() => {
-    // Destroy the existing chart instance if it exists
     if (chartInstanceRef.current) {
       chartInstanceRef.current.destroy();
     }
 
-    // Create a new chart instance
     if (chartRef.current) {
       chartInstanceRef.current = new Chart(chartRef.current, {
         type: "bar",
@@ -57,7 +55,6 @@ const IncomePage = () => {
       });
     }
 
-    // Cleanup function to destroy the chart when the component unmounts
     return () => {
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();
@@ -74,10 +71,10 @@ const IncomePage = () => {
     const url = editing
       ? `http://localhost:5000/api/income/update/${editing}`
       : "http://localhost:5000/api/income/add";
-    axios
-      .post(url, formData, {
-        headers: { "x-auth-token": localStorage.getItem("token") },
-      })
+    const method = editing ? "put" : "post";
+    axios[method](url, formData, {
+      headers: { "x-auth-token": localStorage.getItem("token") },
+    })
       .then((response) => {
         if (editing) {
           setIncomes(
@@ -107,6 +104,19 @@ const IncomePage = () => {
     setFormVisible(true);
   };
 
+  const handleDelete = (id) => {
+    axios
+      .delete(`http://localhost:5000/api/income/delete/${id}`, {
+        headers: { "x-auth-token": localStorage.getItem("token") },
+      })
+      .then(() => {
+        setIncomes(incomes.filter((income) => income._id !== id));
+      })
+      .catch((error) =>
+        console.error("There was an error deleting the income!", error)
+      );
+  };
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -123,77 +133,100 @@ const IncomePage = () => {
       </div>
 
       {formVisible && (
-        <form onSubmit={handleSubmit} className="mb-4">
-          <h2>{editing ? "Edit Income" : "Add New Income"}</h2>
-          <div className="form-group mb-3">
-            <input
-              type="text"
-              name="source"
-              className="form-control"
-              placeholder="Source"
-              value={formData.source}
-              onChange={handleChange}
-              required
-            />
+        <div className="card mb-5 shadow-sm rounded-3">
+          <div className="card-body p-4">
+            <h5 className="card-title mb-4">
+              {editing ? "Edit Income" : "Add New Income"}
+            </h5>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="source" className="form-label">
+                  Source
+                </label>
+                <input
+                  type="text"
+                  id="source"
+                  name="source"
+                  className="form-control"
+                  placeholder="Enter income source"
+                  value={formData.source}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="amount" className="form-label">
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  id="amount"
+                  name="amount"
+                  className="form-control"
+                  placeholder="Enter amount"
+                  value={formData.amount}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="category" className="form-label">
+                  Category
+                </label>
+                <input
+                  type="text"
+                  id="category"
+                  name="category"
+                  className="form-control"
+                  placeholder="Enter category"
+                  value={formData.category}
+                  onChange={handleChange}
+                />
+              </div>
+              <button
+                type="submit"
+                className="btn btn-primary rounded-pill px-4"
+              >
+                {editing ? "Update Income" : "Add Income"}
+              </button>
+            </form>
           </div>
-          <div className="form-group mb-3">
-            <input
-              type="number"
-              name="amount"
-              className="form-control"
-              placeholder="Amount"
-              value={formData.amount}
-              onChange={handleChange}
-              required
-            />
-          </div>
-          <div className="form-group mb-3">
-            <input
-              type="text"
-              name="category"
-              className="form-control"
-              placeholder="Category"
-              value={formData.category}
-              onChange={handleChange}
-            />
-          </div>
-          <button type="submit" className="btn btn-primary">
-            {editing ? "Update Income" : "Add Income"}
-          </button>
-        </form>
+        </div>
       )}
 
-      <h2>Income Visualization</h2>
-      <div className="chart-container mb-4" style={{ height: "400px" }}>
+      <h5 className="mb-4">Income Visualization</h5>
+      <div
+        className="chart-container mb-4 p-3 bg-white rounded shadow"
+        style={{ height: "400px" }}
+      >
         <canvas ref={chartRef}></canvas>
       </div>
 
-      <h2>Income List</h2>
+      <h5>Income List</h5>
       <div className="row">
         {incomes.map((income) => (
           <div key={income._id} className="col-md-4 mb-3">
-            <div className="card">
-              <div className="card-body">
-                <h5 className="card-title">{income.source}</h5>
-                <p className="card-text">
-                  <strong>Amount:</strong> ${income.amount}
-                </p>
-                <p className="card-text">
-                  <strong>Category:</strong> {income.category}
-                </p>
-                <button
-                  className="btn mr-2 mt-3"
-                  onClick={() => handleEdit(income)}
-                  style={{ background: "#17a2b8" }}
-                >
-                 <FaEdit />  Edit
-                </button>
-                <button
-                  className="btn btn-danger ms-2 mt-3"
-                  onClick={() => handleDelete(income._id)}
-                >
-                 <FaTrash />  Delete
-                </button>
+            <div className="card h-100 shadow-sm rounded-3">
+              <div className="card-body d-flex flex-column p-4">
+                <h6 className="card-title">{income.source}</h6>
+                <p className="card-text mb-1">Amount: ${income.amount}</p>
+                <p className="card-text mb-4">Category: {income.category}</p>
+                <div className="mt-auto d-flex">
+                  <button
+                    className="btn mb-2 me-2"
+                    style={{ backgroundColor: "#17a2b8", color: "white" }}
+                    onClick={() => handleEdit(income)}
+                  >
+                    <FaEdit /> Edit
+                  </button>
+                  <button
+                    className="btn btn-danger mb-2"
+                    onClick={() => handleDelete(income._id)}
+                  >
+                    <FaTrash /> Delete
+                  </button>
+                </div>
               </div>
             </div>
           </div>
