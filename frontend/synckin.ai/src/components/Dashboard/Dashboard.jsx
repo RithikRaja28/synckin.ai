@@ -7,6 +7,7 @@ import "./Dashboard.css";
 import { AuthContext } from "../../context/AuthContext";
 import InventoryManager from "../InventoryManagement/InventorySystem";
 import TaskManager from "../TaskManagement/TaskManager";
+import IncomePage from "../Finance Tracker/Income";
 const Dashboard = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
@@ -41,6 +42,7 @@ const Dashboard = () => {
             />
             <Route path="/inventorytracker" element={<InventoryManager />} />
             <Route path="/taskmanager" element={<TaskManager/>}/>
+            <Route path="/incometracker" element = {<IncomePage />} />
           </Routes>
         </div>
       </div>
