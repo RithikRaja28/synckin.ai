@@ -7,6 +7,7 @@ import {
   FaHandHoldingUsd,
 } from "react-icons/fa";
 import IncomePage from "./IncomePage"; // Assuming this is your Income component
+import DebtTracker from "./DebtTracker";
 // Import other components like SavingsPage, ExpensePage, DebtPage
 
 const FinanceTracker = () => {
@@ -21,7 +22,7 @@ const FinanceTracker = () => {
       case "expense":
         return <IncomePage />; // Replace with ExpensePage component
       case "debt":
-        return <IncomePage />; // Replace with DebtPage component
+        return <DebtTracker />; // Replace with DebtPage component
       default:
         return <IncomePage />;
     }
