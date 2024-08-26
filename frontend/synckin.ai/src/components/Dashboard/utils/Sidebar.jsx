@@ -70,9 +70,9 @@ const Sidebar = () => {
             <FaHome className="me-2" /> Dashboard
           </NavLink>
           <NavLink
-            to="/dashboard/incometracker"
+            to="/dashboard/financetracker"
             className={`nav-link ${
-              location.pathname === "/dashboard/incometracker"
+              location.pathname === "/dashboard/financetracker"
                 ? "text-info active"
                 : "text-light"
             }`}

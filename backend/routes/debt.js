@@ -21,7 +21,12 @@ const verifyToken = (req) => {
 
 // Calculate interest
 const calculateInterest = (amount, interestRate) => {
-  return amount + amount * (interestRate / 100);
+  return amount * (interestRate / 100);
+};
+
+// Calculate total amount with interest
+const calculateTotalAmount = (amount, interestAmount) => {
+  return amount + interestAmount;
 };
 
 // Create a new debt
@@ -31,20 +36,39 @@ router.post("/add", async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 
-  const { name, amount, interestRate = 0, dueDate, minimumPayment } = req.body;
+  const {
+    name,
+    amount,
+    interestRate = 0,
+    dueDate,
+    minimumPayment,
+    isInterestApplicable,
+  } = req.body;
+
+  // Convert to numbers
+  const numericAmount = parseFloat(amount);
+  const numericInterestRate = parseFloat(interestRate);
 
   try {
+    let interestAmount = 0;
+    let totalAmount = numericAmount;
+
+    if (isInterestApplicable) {
+      interestAmount = calculateInterest(numericAmount, numericInterestRate);
+      totalAmount = calculateTotalAmount(numericAmount, interestAmount);
+    }
+
     const newDebt = new Debt({
       name,
-      amount,
-      interestRate,
+      amount: numericAmount,
+      interestRate: numericInterestRate,
+      interestAmount,
+      totalAmount,
       dueDate,
       userId,
-      minimumPayment,
+      minimumPayment: parseFloat(minimumPayment),
+      isInterestApplicable,
     });
-
-    // Automatically calculate the updated amount based on the interest rate
-    newDebt.amount = calculateInterest(newDebt.amount, newDebt.interestRate);
 
     const savedDebt = await newDebt.save();
     res.json(savedDebt);
@@ -53,6 +77,7 @@ router.post("/add", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
+
 
 // Get all debts for a user
 router.get("/show", async (req, res) => {
@@ -77,7 +102,14 @@ router.put("/update/:id", async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 
-  const { name, amount, interestRate, dueDate, minimumPayment } = req.body;
+  const {
+    name,
+    amount,
+    interestRate,
+    dueDate,
+    minimumPayment,
+    isInterestApplicable,
+  } = req.body;
 
   try {
     let debt = await Debt.findOne({ _id: req.params.id, userId });
@@ -92,9 +124,19 @@ router.put("/update/:id", async (req, res) => {
       interestRate !== undefined ? interestRate : debt.interestRate;
     debt.dueDate = dueDate || debt.dueDate;
     debt.minimumPayment = minimumPayment || debt.minimumPayment;
+    debt.isInterestApplicable =
+      isInterestApplicable !== undefined
+        ? isInterestApplicable
+        : debt.isInterestApplicable;
 
-    // Recalculate the amount based on the new interest rate
-    debt.amount = calculateInterest(debt.amount, debt.interestRate);
+    // Recalculate interest and total amount if interest is applicable
+    if (debt.isInterestApplicable) {
+      debt.interestAmount = calculateInterest(debt.amount, debt.interestRate);
+      debt.totalAmount = calculateTotalAmount(debt.amount, debt.interestAmount);
+    } else {
+      debt.interestAmount = 0;
+      debt.totalAmount = debt.amount;
+    }
 
     debt.lastUpdatedDate = Date.now();
 

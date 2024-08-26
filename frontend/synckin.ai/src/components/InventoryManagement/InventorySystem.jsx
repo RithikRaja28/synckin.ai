@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaCalendarAlt, FaListUl } from "react-icons/fa";
+
 const InventoryManager = () => {
   const [inventoryItems, setInventoryItems] = useState([]);
   const [newItem, setNewItem] = useState({
@@ -160,35 +161,48 @@ const InventoryManager = () => {
           <div className="card shadow-lg">
             <div className="card-body">
               <h4 className="text-muted">Your Inventory Items</h4>
-              <ul className="list-group">
+              <div className="list-group">
                 {inventoryItems.map((item) => (
-                  <li
+                  <div
                     key={item._id}
-                    className="list-group-item d-flex justify-content-between align-items-center"
+                    className="card mb-3 shadow-sm p-3 rounded"
+                    style={{ backgroundColor: "#f8f9fa", transition: "0.3s" }}
                   >
-                    <div>
-                      <strong>{item.name}</strong> - {item.quantity} -{" "}
-                      {item.description} - Due:{" "}
-                      {new Date(item.dueDate).toLocaleDateString()}
+                    <div className="card-body d-flex justify-content-between align-items-center">
+                      <div>
+                        <h5 className="mb-1">
+                          <strong>{item.name}</strong>
+                        </h5>
+                        <p className="mb-1 text-secondary">
+                          <FaListUl className="me-2" />
+                          {item.quantity} items
+                        </p>
+                        <p className="mb-1 text-secondary">
+                          <FaCalendarAlt className="me-2" />
+                          Due: {new Date(item.dueDate).toLocaleDateString()}
+                        </p>
+                        <p className="mb-0 text-secondary">
+                          {item.description}
+                        </p>
+                      </div>
+                      <div>
+                        <button
+                          className="btn btn-info btn-sm me-2"
+                          onClick={() => handleEditItem(item)}
+                        >
+                          <FaEdit /> Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteItem(item._id)}
+                        >
+                          <FaTrash /> Delete
+                        </button>
+                      </div>
                     </div>
-                    <div>
-                      <button
-                        className="btn btn-sm me-2"
-                        style={{ backgroundColor: "#17a2b8", color: "#fff" }}
-                        onClick={() => handleEditItem(item)}
-                      >
-                        <FaEdit /> Edit
-                      </button>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDeleteItem(item._id)}
-                      >
-                       <FaTrash/> Delete
-                      </button>
-                    </div>
-                  </li>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </div>
