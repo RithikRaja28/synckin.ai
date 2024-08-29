@@ -252,7 +252,8 @@ const Debt = () => {
                 <div className="d-flex justify-content-between">
                   <button
                     onClick={() => handleEdit(debt)}
-                    className="btn btn-warning"
+                    className="btn"
+                    style={{ backgroundColor: "#17a2b8", color: "white" }}
                   >
                    <FaEdit/> Edit
                   </button>

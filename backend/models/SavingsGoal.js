@@ -11,9 +11,9 @@ const savingsGoalSchema = new Schema({
   lastUpdatedDate: { type: Date, default: Date.now },
   frequency: {
     type: String,
-    enum: ["Monthly", "annually"],
+    enum: ["Monthly", "Annually"],
     default: "Annually",
-  }, // e.g., monthly, annually
+  },
 });
 
 module.exports = mongoose.model("SavingsGoal", savingsGoalSchema);

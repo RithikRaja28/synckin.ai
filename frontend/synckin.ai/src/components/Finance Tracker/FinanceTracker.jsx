@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import IncomePage from "./IncomePage"; // Assuming this is your Income component
 import DebtTracker from "./DebtTracker";
+import SavingsTracker from "./SavingTracker";
 // Import other components like SavingsPage, ExpensePage, DebtPage
 
 const FinanceTracker = () => {
@@ -18,7 +19,7 @@ const FinanceTracker = () => {
       case "income":
         return <IncomePage />;
       case "savings":
-        return <IncomePage />; // Replace with SavingsPage component
+        return <SavingsTracker />; // Replace with SavingsPage component
       case "expense":
         return <IncomePage />; // Replace with ExpensePage component
       case "debt":
