@@ -2,6 +2,10 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { Chart, registerables } from "chart.js";
+import { Line } from "react-chartjs-2";
+
+Chart.register(...registerables);
 
 const SavingsPage = () => {
   const [savings, setSavings] = useState([]);
@@ -12,7 +16,7 @@ const SavingsPage = () => {
     targetDate: "",
     interestRate: 0,
     frequency: "Annually",
-    hasInterestRate: false, // New field for toggling interest rate input
+    hasInterestRate: false,
   });
   const [editing, setEditing] = useState(null);
   const [formVisible, setFormVisible] = useState(false);
@@ -81,10 +85,10 @@ const SavingsPage = () => {
       goal: saving.goal,
       targetAmount: saving.targetAmount,
       currentAmount: saving.currentAmount,
-      targetDate: saving.targetDate.split("T")[0], // Format date for input
+      targetDate: saving.targetDate.split("T")[0],
       interestRate: saving.interestRate,
       frequency: saving.frequency,
-      hasInterestRate: saving.interestRate > 0, // Check if interest rate is present
+      hasInterestRate: saving.interestRate > 0,
     });
     setFormVisible(true);
   };
@@ -102,6 +106,19 @@ const SavingsPage = () => {
       );
   };
 
+  const chartData = {
+    labels: savings.map((saving) => saving.goal),
+    datasets: [
+      {
+        label: "Target Amount vs Current Amount",
+        data: savings.map((saving) => saving.currentAmount),
+        borderColor: "rgba(75,192,192,1)",
+        backgroundColor: "rgba(75,192,192,0.2)",
+        fill: true,
+      },
+    ],
+  };
+
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -116,7 +133,6 @@ const SavingsPage = () => {
           <FaPlus /> {formVisible ? "Cancel" : "Add Saving Goal"}
         </button>
       </div>
-
       {formVisible && (
         <div className="card mb-5 shadow-sm rounded-3">
           <div className="card-body p-4">
@@ -245,7 +261,11 @@ const SavingsPage = () => {
           </div>
         </div>
       )}
-
+      <h5 className="mb-4">Savings Goals Overview</h5>
+      <div className="mb-5">
+        <Line data={chartData} />
+      </div>
+      php Copy code
       <h5>Savings Goals List</h5>
       <div className="row">
         {savings.map((saving) => (
@@ -254,10 +274,12 @@ const SavingsPage = () => {
               <div className="card-body d-flex flex-column p-4">
                 <h6 className="card-title">{saving.goal}</h6>
                 <p className="card-text mb-1">
-                  Target Amount: ${saving.targetAmount}
+                  Target Amount: ₹
+                  {new Intl.NumberFormat().format(saving.targetAmount)}
                 </p>
                 <p className="card-text mb-1">
-                  Current Amount: ${saving.currentAmount}
+                  Current Amount: ₹
+                  {new Intl.NumberFormat().format(saving.currentAmount)}
                 </p>
                 <p className="card-text mb-1">
                   Target Date:{" "}
