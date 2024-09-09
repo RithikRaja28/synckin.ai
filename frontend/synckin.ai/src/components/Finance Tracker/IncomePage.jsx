@@ -1,10 +1,10 @@
+// IncomePage.js
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
-import Chart from "chart.js/auto";
-import "bootstrap/dist/css/bootstrap.min.css";
+import IncomeChart from "../Finance Tracker/utils/IncomeChart"; // Import the shared chart component
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 
-const IncomePage = () => {
+const IncomePage = ({ onIncomeDataUpdate }) => {
   const [incomes, setIncomes] = useState([]);
   const [formData, setFormData] = useState({
     source: "",
@@ -13,8 +13,6 @@ const IncomePage = () => {
   });
   const [editing, setEditing] = useState(null);
   const [formVisible, setFormVisible] = useState(false);
-  const chartRef = useRef(null);
-  const chartInstanceRef = useRef(null);
 
   useEffect(() => {
     axios
@@ -24,43 +22,12 @@ const IncomePage = () => {
       .then((response) => {
         const incomeData = Array.isArray(response.data) ? response.data : [];
         setIncomes(incomeData);
+        onIncomeDataUpdate(incomeData); // Notify Dashboard of initial data
       })
       .catch((error) =>
         console.error("There was an error fetching the incomes!", error)
       );
-  }, []);
-
-  useEffect(() => {
-    if (chartInstanceRef.current) {
-      chartInstanceRef.current.destroy();
-    }
-
-    if (chartRef.current) {
-      chartInstanceRef.current = new Chart(chartRef.current, {
-        type: "bar",
-        data: {
-          labels: incomes.map((income) => income.source),
-          datasets: [
-            {
-              label: "Income",
-              data: incomes.map((income) => income.amount),
-              backgroundColor: "rgba(75, 192, 192, 0.6)",
-            },
-          ],
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-        },
-      });
-    }
-
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
-  }, [incomes]);
+  }, [onIncomeDataUpdate]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -88,6 +55,7 @@ const IncomePage = () => {
         setFormData({ source: "", amount: 0, category: "" });
         setEditing(null);
         setFormVisible(false);
+        onIncomeDataUpdate([...incomes, response.data]); // Update Dashboard with new data
       })
       .catch((error) =>
         console.error("There was an error processing the income!", error)
@@ -110,7 +78,9 @@ const IncomePage = () => {
         headers: { "x-auth-token": localStorage.getItem("token") },
       })
       .then(() => {
-        setIncomes(incomes.filter((income) => income._id !== id));
+        const updatedIncomes = incomes.filter((income) => income._id !== id);
+        setIncomes(updatedIncomes);
+        onIncomeDataUpdate(updatedIncomes); // Update Dashboard with new data
       })
       .catch((error) =>
         console.error("There was an error deleting the income!", error)
@@ -195,15 +165,9 @@ const IncomePage = () => {
         </div>
       )}
 
-      <h5 className="mb-4">Income Visualization</h5>
-      <div
-        className="chart-container mb-4 p-3 bg-white rounded shadow"
-        style={{ height: "400px" }}
-      >
-        <canvas ref={chartRef}></canvas>
-      </div>
+      <IncomeChart incomes={incomes} />
 
-      <h5>Income List</h5>
+      <h5 className="mb-4">Income List</h5>
       <div className="row">
         {incomes.map((income) => (
           <div key={income._id} className="col-md-4 mb-3">
