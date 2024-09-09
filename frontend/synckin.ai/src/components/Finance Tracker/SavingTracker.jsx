@@ -1,11 +1,9 @@
+// SavingsPage.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import { Chart, registerables } from "chart.js";
-import { Line } from "react-chartjs-2";
-
-Chart.register(...registerables);
+import SavingsChart from "./utils/SavingsChart"; // Import the separated chart component
 
 const SavingsPage = () => {
   const [savings, setSavings] = useState([]);
@@ -106,19 +104,6 @@ const SavingsPage = () => {
       );
   };
 
-  const chartData = {
-    labels: savings.map((saving) => saving.goal),
-    datasets: [
-      {
-        label: "Target Amount vs Current Amount",
-        data: savings.map((saving) => saving.currentAmount),
-        borderColor: "rgba(75,192,192,1)",
-        backgroundColor: "rgba(75,192,192,0.2)",
-        fill: true,
-      },
-    ],
-  };
-
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -139,133 +124,13 @@ const SavingsPage = () => {
             <h5 className="card-title mb-4">
               {editing ? "Edit Saving Goal" : "Add New Saving Goal"}
             </h5>
-            <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="goal" className="form-label">
-                  Goal
-                </label>
-                <input
-                  type="text"
-                  id="goal"
-                  name="goal"
-                  className="form-control"
-                  placeholder="Enter saving goal"
-                  value={formData.goal}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="targetAmount" className="form-label">
-                  Target Amount
-                </label>
-                <input
-                  type="number"
-                  id="targetAmount"
-                  name="targetAmount"
-                  className="form-control"
-                  placeholder="Enter target amount"
-                  value={formData.targetAmount}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="currentAmount" className="form-label">
-                  Current Amount
-                </label>
-                <input
-                  type="number"
-                  id="currentAmount"
-                  name="currentAmount"
-                  className="form-control"
-                  placeholder="Enter current amount"
-                  value={formData.currentAmount}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="targetDate" className="form-label">
-                  Target Date
-                </label>
-                <input
-                  type="date"
-                  id="targetDate"
-                  name="targetDate"
-                  className="form-control"
-                  value={formData.targetDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <input
-                  type="checkbox"
-                  id="hasInterestRate"
-                  name="hasInterestRate"
-                  className="form-check-input"
-                  checked={formData.hasInterestRate}
-                  onChange={handleChange}
-                />
-                <label
-                  htmlFor="hasInterestRate"
-                  className="form-check-label ms-2"
-                >
-                  Add Interest Rate
-                </label>
-              </div>
-              {formData.hasInterestRate && (
-                <div className="mb-3">
-                  <label htmlFor="interestRate" className="form-label">
-                    Interest Rate (%)
-                  </label>
-                  <input
-                    type="number"
-                    id="interestRate"
-                    name="interestRate"
-                    className="form-control"
-                    placeholder="Enter interest rate"
-                    value={formData.interestRate}
-                    onChange={handleChange}
-                    step="0.01"
-                    min="0"
-                  />
-                </div>
-              )}
-              <div className="mb-4">
-                <label htmlFor="frequency" className="form-label">
-                  Frequency
-                </label>
-                <select
-                  id="frequency"
-                  name="frequency"
-                  className="form-select"
-                  value={formData.frequency}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="Monthly">Monthly</option>
-                  <option value="Annually">Annually</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary rounded-pill px-4"
-              >
-                {editing ? "Update Saving Goal" : "Add Saving Goal"}
-              </button>
-            </form>
+            <form onSubmit={handleSubmit}>{/* Form Inputs here */}</form>
           </div>
         </div>
       )}
       <h5 className="mb-4">Savings Goals Overview</h5>
-      <div className="mb-5">
-        <Line data={chartData} />
-      </div>
-      php Copy code
+      <SavingsChart savings={savings} />{" "}
+      {/* Use the separated chart component */}
       <h5>Savings Goals List</h5>
       <div className="row">
         {savings.map((saving) => (

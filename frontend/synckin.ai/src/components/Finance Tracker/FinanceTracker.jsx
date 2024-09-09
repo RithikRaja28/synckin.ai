@@ -18,10 +18,10 @@ const FinanceTracker = () => {
     switch (activeSection) {
       case "income":
         return <IncomePage />;
-      case "savings":
-        return <SavingsTracker />; // Replace with SavingsPage component
       case "expense":
         return <IncomePage />; // Replace with ExpensePage component
+      case "savings":
+        return <SavingsTracker />; // Replace with SavingsPage component
       case "debt":
         return <DebtTracker />; // Replace with DebtPage component
       default:
@@ -30,11 +30,7 @@ const FinanceTracker = () => {
   };
 
   return (
-    <div
-      className="container mt-2 p-4"
-      
-    >
-
+    <div className="container mt-2 p-4">
       {/* Buttons on the top */}
       <div className="d-flex justify-content-around mb-5">
         <button
@@ -48,21 +44,21 @@ const FinanceTracker = () => {
         </button>
         <button
           className={`btn btn-light btn-lg ${
-            activeSection === "savings" ? "active btn-primary text-white" : ""
-          }`}
-          style={{ width: "150px", borderRadius: "30px" }}
-          onClick={() => setActiveSection("savings")}
-        >
-          <FaPiggyBank className="me-2" /> Savings
-        </button>
-        <button
-          className={`btn btn-light btn-lg ${
             activeSection === "expense" ? "active btn-primary text-white" : ""
           }`}
           style={{ width: "150px", borderRadius: "30px" }}
           onClick={() => setActiveSection("expense")}
         >
           <FaShoppingCart className="me-2" /> Expense
+        </button>
+        <button
+          className={`btn btn-light btn-lg ${
+            activeSection === "savings" ? "active btn-primary text-white" : ""
+          }`}
+          style={{ width: "150px", borderRadius: "30px" }}
+          onClick={() => setActiveSection("savings")}
+        >
+          <FaPiggyBank className="me-2" /> Savings
         </button>
         <button
           className={`btn btn-light btn-lg ${
