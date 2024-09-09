@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Pie } from "react-chartjs-2";
+import DebtChart from "./utils/DebtChart"; // Import the DebtChart component
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+
 const Debt = () => {
   const [debts, setDebts] = useState([]);
   const [formData, setFormData] = useState({
@@ -13,7 +14,6 @@ const Debt = () => {
     minimumPayment: 0,
     isInterestApplicable: false,
   });
-
   const [isEditing, setIsEditing] = useState(false);
   const [editId, setEditId] = useState(null);
 
@@ -216,7 +216,7 @@ const Debt = () => {
         <div className="col-md-6">
           <h2 className="mb-4">Debt Distribution</h2>
           <div className="bg-light p-4 rounded shadow-sm">
-            <Pie data={chartData} />
+            <DebtChart debts={debts} />
           </div>
         </div>
       </div>
@@ -255,13 +255,13 @@ const Debt = () => {
                     className="btn"
                     style={{ backgroundColor: "#17a2b8", color: "white" }}
                   >
-                   <FaEdit/> Edit
+                    <FaEdit /> Edit
                   </button>
                   <button
                     onClick={() => handleDelete(debt._id)}
                     className="btn btn-danger"
                   >
-                   <FaTrash/> Delete
+                    <FaTrash /> Delete
                   </button>
                 </div>
               </div>
