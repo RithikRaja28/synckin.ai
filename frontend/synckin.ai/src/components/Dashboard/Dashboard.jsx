@@ -1,20 +1,77 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Sidebar from "./utils/Sidebar";
 import Header from "./utils/Header";
-import ExpenseTracker from "../features/ExpenseTracker";
 import "./Dashboard.css";
 import { AuthContext } from "../../context/AuthContext";
+import InventoryManager from "../InventoryManagement/InventorySystem";
+import TaskManager from "../TaskManagement/TaskManager";
+import IncomePage from "../Finance Tracker/IncomePage";
+import FinanceTracker from "../Finance Tracker/FinanceTracker";
+import IncomeChart from "../Finance Tracker/utils/IncomeChart";
+import DebtChart from "../Finance Tracker/utils/DebtChart"; // Import the DebtChart
+import axios from "axios";
+import SavingsChart from "../Finance Tracker/utils/SavingsChart";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
-  console.log(auth);
+  const [incomes, setIncomes] = useState([]);
+  const [debts, setDebts] = useState([]); // State for debts
+   const [savings, setSavings] = useState([]);
+
   useEffect(() => {
     if (!auth.isAuthenticated) {
       navigate("/login");
       console.log("User is not authenticated. Redirecting to login...");
     }
   }, [auth.isAuthenticated, navigate]);
+
+  useEffect(() => {
+    // Fetch income data for the chart
+    axios
+      .get("http://localhost:5000/api/income/show", {
+        headers: { "x-auth-token": localStorage.getItem("token") },
+      })
+      .then((response) => {
+        const incomeData = Array.isArray(response.data) ? response.data : [];
+        setIncomes(incomeData);
+      })
+      .catch((error) =>
+        console.error("There was an error fetching the incomes!", error)
+      );
+  }, []);
+
+  useEffect(() => {
+    // Fetch debt data for the chart
+    axios
+      .get("http://localhost:5000/api/debt/show", {
+        headers: { "x-auth-token": localStorage.getItem("token") },
+      })
+      .then((response) => {
+        const debtData = Array.isArray(response.data) ? response.data : [];
+        setDebts(debtData);
+      })
+      .catch((error) =>
+        console.error("There was an error fetching the debts!", error)
+      );
+  }, []);
+
+   useEffect(() => {
+     // Fetch savings data for the chart
+     axios
+       .get("http://localhost:5000/api/savings/show", {
+         headers: { "x-auth-token": localStorage.getItem("token") },
+       })
+       .then((response) => {
+         const savingsData = Array.isArray(response.data) ? response.data : [];
+         setSavings(savingsData);
+       })
+       .catch((error) =>
+         console.error("There was an error fetching the savings!", error)
+       );
+   }, []);
+
   return (
     <div className="d-flex vh-100 w-100">
       <Sidebar />
@@ -32,12 +89,26 @@ const Dashboard = () => {
               path="/"
               element={
                 <div>
-                  <h1>Welcome to the Dashboard</h1>{" "}
+                  <h1>Welcome to the Dashboard</h1>
                   {auth.user && <p>Hello, {auth.user.username}</p>}
+                  {/* Grid Layout for Income and Debt Charts */}
+                  <div className="dashboard-grid">
+                    <div className="chart-item">
+                      <IncomeChart incomes={incomes} />
+                    </div>
+                    <div className="chart-item">
+                      <DebtChart debts={debts} />
+                    </div>
+                  </div>
+                    <div className="chart-item">
+                      <SavingsChart savings={savings} />
+                    </div>
                 </div>
               }
             />
-            <Route path="/expenses" element={<ExpenseTracker />} />
+            <Route path="/inventorytracker" element={<InventoryManager />} />
+            <Route path="/taskmanager" element={<TaskManager />} />
+            <Route path="/financetracker" element={<FinanceTracker />} />
           </Routes>
         </div>
       </div>
