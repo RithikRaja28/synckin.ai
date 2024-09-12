@@ -71,6 +71,7 @@ const TaskManager = () => {
       setTasks(
         tasks.map((task) => (task._id === temporaryId ? response.data : task))
       );
+      fetchTasks();
       resetTaskForm();
       setLoading(false);
     } catch (error) {
