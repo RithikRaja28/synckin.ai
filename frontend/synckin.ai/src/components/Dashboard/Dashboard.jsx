@@ -12,6 +12,7 @@ import IncomeChart from "../Finance Tracker/utils/IncomeChart";
 import DebtChart from "../Finance Tracker/utils/DebtChart"; // Import the DebtChart
 import axios from "axios";
 import SavingsChart from "../Finance Tracker/utils/SavingsChart";
+import FamilyConnect from "../Family Connect/FamilyConnect";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -109,6 +110,7 @@ const Dashboard = () => {
             <Route path="/inventorytracker" element={<InventoryManager />} />
             <Route path="/taskmanager" element={<TaskManager />} />
             <Route path="/financetracker" element={<FinanceTracker />} />
+            <Route path="/family" element={<FamilyConnect />} />
           </Routes>
         </div>
       </div>

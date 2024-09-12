@@ -10,6 +10,7 @@
   const expense = require("./routes/expense");
   const budget = require("./routes/budget");
   const debt = require("./routes/debt");
+  const family = require("./routes/family");
 
   const app = express();
 
@@ -40,3 +41,4 @@
   app.use("/api/expense", expense);
   app.use("/api/budget", budget);
   app.use("/api/debt", debt);
+  app.use("/api/family", family);

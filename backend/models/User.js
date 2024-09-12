@@ -20,6 +20,10 @@ const UserSchema = new mongoose.Schema({
         enum:['Parent','Children'],
         required:true,
     },
+    familyId:{
+        type: mongoose.Schema.ObjectId,
+        ref: "Family",
+    },
     date:{
         type:Date,
         default:Date.now

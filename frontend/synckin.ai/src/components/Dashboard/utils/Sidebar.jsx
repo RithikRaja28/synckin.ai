@@ -77,7 +77,7 @@ const Sidebar = () => {
                 : "text-light"
             }`}
           >
-            <FaDollarSign className="me-2" /> Expense Tracker
+            <FaDollarSign className="me-2" /> Finance Tracker
           </NavLink>
           <NavLink
             to="/dashboard/inventorytracker"
