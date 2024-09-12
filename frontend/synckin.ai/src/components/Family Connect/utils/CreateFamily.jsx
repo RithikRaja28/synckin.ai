@@ -1,35 +1,91 @@
 import React, { useState } from "react";
 import axios from "axios";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 
 const CreateFamily = () => {
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [familyName, setFamilyName] = useState("");
+  const [open, setOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    type: "",
+  });
 
- const createFamily = async () => {
-   const token = localStorage.getItem("token");
-   const familyName = "My Family Name"; // Get this value from a form input
+  const handleCreate = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/family/create",
+        { familyName },
+        { headers: { "x-auth-token": token } }
+      );
+      setSnackbar({
+        open: true,
+        message: "Family created successfully!",
+        type: "success",
+      });
+      setOpen(false);
+    } catch (error) {
+      setSnackbar({
+        open: true,
+        message: "Error creating family!",
+        type: "error",
+      });
+    }
+  };
 
-   try {
-     const response = await axios.post(
-       "http://localhost:5000/api/family/create",
-       { familyName }, // Include familyName in the request body
-       {
-         headers: { "x-auth-token": token },
-       }
-     );
-     console.log("Family created:", response.data);
-   } catch (error) {
-     console.error("Error creating family:", error.response.data);
-   }
- };
+  const handleCloseSnackbar = () =>
+    setSnackbar({ open: false, message: "", type: "" });
+
   return (
     <div>
-      <h3>Create Family</h3>
-      <button className="btn btn-primary" onClick={createFamily}>
+      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
         Create Family
-      </button>
-      {error && <div className="alert alert-danger mt-2">{error}</div>}
-      {success && <div className="alert alert-success mt-2">{success}</div>}
+      </Button>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Create a Family</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter a name for your family group.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Family Name"
+            type="text"
+            fullWidth
+            value={familyName}
+            onChange={(e) => setFamilyName(e.target.value)}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleCreate} color="primary">
+            Create
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.type}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

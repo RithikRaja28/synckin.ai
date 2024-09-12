@@ -1,61 +1,99 @@
 import React, { useState } from "react";
 import axios from "axios";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Select,
+  MenuItem,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 
 const AddFamilyMember = () => {
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState("Child");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [role, setRole] = useState("Parent");
+  const [open, setOpen] = useState(false);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: "",
+    type: "",
+  });
 
   const addFamilyMember = async () => {
     const token = localStorage.getItem("token");
-
     try {
-      const response = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/family/add-member",
-        { username, role }, // Send the role and username
-        {
-          headers: { "x-auth-token": token },
-        }
+        { username, role },
+        { headers: { "x-auth-token": token } }
       );
-      setSuccess("Member added successfully");
-      setError("");
-      console.log("Member added:", response.data);
+      setSnackbar({
+        open: true,
+        message: "Member added successfully!",
+        type: "success",
+      });
+      setOpen(false);
     } catch (error) {
-      setError("Error adding member");
-      setSuccess("");
-      console.error("Error adding member:", error.response.data);
+      setSnackbar({
+        open: true,
+        message: "Error adding member!",
+        type: "error",
+      });
     }
   };
 
+  const handleCloseSnackbar = () =>
+    setSnackbar({ open: false, message: "", type: "" });
+
   return (
     <div>
-      <h3>Add Family Member</h3>
-      <div className="form-group">
-        <label>Username</label>
-        <input
-          type="text"
-          className="form-control"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div className="form-group">
-        <label>Role</label>
-        <select
-          className="form-control"
-          value={role}
-          onChange={(e) => setRole(e.target.value)}
-        >
-          <option value="Parent">Parent</option>
-          <option value="Children">Children</option>
-        </select>
-      </div>
-      <button className="btn btn-primary" onClick={addFamilyMember}>
-        Add Member
-      </button>
-      {error && <div className="alert alert-danger mt-2">{error}</div>}
-      {success && <div className="alert alert-success mt-2">{success}</div>}
+      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+        Add Family Member
+      </Button>
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Add Family Member</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Username"
+            type="text"
+            fullWidth
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <Select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            fullWidth
+            margin="dense"
+          >
+            <MenuItem value="Parent">Parent</MenuItem>
+            <MenuItem value="Children">Children</MenuItem>
+          </Select>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={addFamilyMember} color="primary">
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbar.type}>
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };

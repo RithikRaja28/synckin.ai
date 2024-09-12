@@ -42,12 +42,14 @@ router.get("/show", async (req, res) => {
       return res.status(404).json({ msg: "Family not found" });
     }
 
+    // Return family details if the user is part of the family
     res.json(family);
   } catch (err) {
     console.error("Error in /family route:", err.message);
     res.status(500).send("Server Error");
   }
 });
+
 
 
 router.post("/create", async (req, res) => {
@@ -140,6 +142,49 @@ router.post("/add-member", async (req, res) => {
     res.status(500).send("Server error");
   }
 });
+
+router.delete("/delete", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    // Find the user
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Check if the user is the parent of the family
+    const family = await Family.findById(user.familyId);
+    if (!family) {
+      return res.status(404).json({ msg: "Family not found" });
+    }
+
+    if (family.parentId.toString() !== user._id.toString()) {
+      return res
+        .status(403)
+        .json({ msg: "Only the parent can delete the family." });
+    }
+
+    // If user is the parent, delete the family
+    await Family.findByIdAndDelete(family._id);
+
+    // Remove the family ID from all family members
+    await User.updateMany(
+      { familyId: family._id },
+      { $unset: { familyId: 1 } }
+    );
+
+    res.json({ msg: "Family deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting family:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
 
 
 module.exports = router;
