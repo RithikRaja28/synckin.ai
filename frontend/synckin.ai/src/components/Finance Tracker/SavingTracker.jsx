@@ -124,7 +124,125 @@ const SavingsPage = () => {
             <h5 className="card-title mb-4">
               {editing ? "Edit Saving Goal" : "Add New Saving Goal"}
             </h5>
-            <form onSubmit={handleSubmit}>{/* Form Inputs here */}</form>
+            <form onSubmit={handleSubmit}>
+              <div className="mb-3">
+                <label htmlFor="goal" className="form-label">
+                  Goal
+                </label>
+                <input
+                  type="text"
+                  id="goal"
+                  name="goal"
+                  className="form-control"
+                  placeholder="Enter saving goal"
+                  value={formData.goal}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="targetAmount" className="form-label">
+                  Target Amount
+                </label>
+                <input
+                  type="number"
+                  id="targetAmount"
+                  name="targetAmount"
+                  className="form-control"
+                  placeholder="Enter target amount"
+                  value={formData.targetAmount}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="currentAmount" className="form-label">
+                  Current Amount
+                </label>
+                <input
+                  type="number"
+                  id="currentAmount"
+                  name="currentAmount"
+                  className="form-control"
+                  placeholder="Enter current amount"
+                  value={formData.currentAmount}
+                  onChange={handleChange}
+                  required
+                  min="0"
+                />
+              </div>
+              <div className="mb-3">
+                <label htmlFor="targetDate" className="form-label">
+                  Target Date
+                </label>
+                <input
+                  type="date"
+                  id="targetDate"
+                  name="targetDate"
+                  className="form-control"
+                  value={formData.targetDate}
+                  onChange={handleChange}
+                  required
+                />
+              </div>
+              <div className="mb-3">
+                <input
+                  type="checkbox"
+                  id="hasInterestRate"
+                  name="hasInterestRate"
+                  className="form-check-input"
+                  checked={formData.hasInterestRate}
+                  onChange={handleChange}
+                />
+                <label
+                  htmlFor="hasInterestRate"
+                  className="form-check-label ms-2"
+                >
+                  Add Interest Rate
+                </label>
+              </div>
+              {formData.hasInterestRate && (
+                <div className="mb-3">
+                  <label htmlFor="interestRate" className="form-label">
+                    Interest Rate (%)
+                  </label>
+                  <input
+                    type="number"
+                    id="interestRate"
+                    name="interestRate"
+                    className="form-control"
+                    placeholder="Enter interest rate"
+                    value={formData.interestRate}
+                    onChange={handleChange}
+                    step="0.01"
+                    min="0"
+                  />
+                </div>
+              )}
+              <div className="mb-4">
+                <label htmlFor="frequency" className="form-label">
+                  Frequency
+                </label>
+                <select
+                  id="frequency"
+                  name="frequency"
+                  className="form-select"
+                  value={formData.frequency}
+                  onChange={handleChange}
+                  required
+                >
+                  <option value="Monthly">Monthly</option>
+                  <option value="Annually">Annually</option>
+                </select>
+              </div>
+              <button
+                type="submit"
+                className="btn btn-primary rounded-pill px-4"
+              >
+                {editing ? "Update Saving Goal" : "Add Saving Goal"}
+              </button>
+            </form>
           </div>
         </div>
       )}
