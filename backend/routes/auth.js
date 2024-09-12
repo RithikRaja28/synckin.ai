@@ -18,6 +18,7 @@
           "password",
           "Please enter a password with 6 or more characters"
         ).isLength({ min: 6 }),
+        check("role", "Role is required").not().isEmpty(), // Validate role
       ],
       async (req, res) => {
         const errors = validationResult(req);
@@ -26,7 +27,7 @@
           return res.status(400).json({ errors: errors.array() });
         }
 
-        const { username, email, password } = req.body;
+        const { username, email, password, role } = req.body; // Include role
 
         try {
           console.log("Checking for existing user with email:", email); // Log for debugging
@@ -36,7 +37,8 @@
             return res.status(400).json({ msg: "User already exists" });
           }
 
-          user = new User({ username, email, password });
+          // Include role when creating the new user
+          user = new User({ username, email, password, role });
 
           const salt = await bcrypt.genSalt(10);
           user.password = await bcrypt.hash(password, salt);
@@ -63,6 +65,7 @@
         }
       }
     );
+
 
 
     // Login a user

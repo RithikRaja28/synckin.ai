@@ -8,13 +8,14 @@ const Signup = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role,setRole] = useState("");
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const onSubmit = async (e) => {
     e.preventDefault();
     try {
-      await register(username, email, password);
+      await register(username, email, password, role);
       console.log("Registration successful");
       navigate("/dashboard");
       // Redirect to dashboard or another page after successful signup
@@ -112,6 +113,28 @@ const Signup = () => {
                       style={{ borderRadius: "5px", boxShadow: "none" }}
                       required
                     />
+                  </div>
+                </Form.Group>
+
+                <Form.Group className="mb-3" controlId="formRole">
+                  <Form.Label className="text-light">Role</Form.Label>
+                  <div className="input-group">
+                    <div className="input-group-prepend">
+                      <span className="input-group-text bg-secondary text-light">
+                        <FaUser />
+                      </span>
+                    </div>
+                    <Form.Select
+                      value={role}
+                      onChange={(e) => setRole(e.target.value)}
+                      className="bg-dark text-light border-0 ms-2"
+                      style={{ borderRadius: "5px", boxShadow: "none" }}
+                      required
+                    >
+                      <option value="">Select Role</option>
+                      <option value="Parent">Parent</option>
+                      <option value="Children">Children</option>
+                    </Form.Select>
                   </div>
                 </Form.Group>
 
