@@ -50,6 +50,33 @@ router.get("/show", async (req, res) => {
   }
 });
 
+// Add this route to search users
+router.get("/search", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const { query } = req.query;
+
+  try {
+    // Ensure a search query is provided
+    if (!query) {
+      return res.status(400).json({ msg: "Search query is required" });
+    }
+
+    // Find users matching the search query
+    const users = await User.find({
+      username: { $regex: query, $options: "i" }, 
+      familyId: { $exists: false } 
+    }).limit(10); 
+
+    res.json(users);
+  } catch (err) {
+    console.error("Error searching users:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 
 router.post("/create", async (req, res) => {
@@ -182,6 +209,62 @@ router.delete("/delete", async (req, res) => {
   } catch (err) {
     console.error("Error deleting family:", err.message);
     res.status(500).send("Server Error");
+  }
+});
+
+
+router.delete("/remove-member", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const { _id } = req.body; // Using _id instead of memberId
+
+  try {
+    if (!_id) {
+      return res.status(400).json({ msg: "Member ID (_id) is required." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found." });
+    }
+
+    if (user.role !== "Parent") {
+      return res
+        .status(403)
+        .json({ msg: "Only parents can remove family members." });
+    }
+
+    const family = await Family.findById(user.familyId);
+    if (!family) {
+      return res.status(404).json({ msg: "Family not found." });
+    }
+
+    // Check if the member with the given _id is part of the family
+    const member = family.members.find((m) => m.userId.toString() === _id);
+    if (!member) {
+      return res.status(404).json({ msg: "Member not found in the family." });
+    }
+
+    // Remove member from Family members array
+    family.members = family.members.filter(
+      (m) => m.userId.toString() !== _id.toString()
+    );
+    await family.save();
+
+    // Remove familyId from the member
+    const memberUser = await User.findById(_id);
+    if (memberUser) {
+      memberUser.familyId = null;
+      await memberUser.save();
+    }
+
+    res.json({ msg: "Member removed successfully" });
+  } catch (err) {
+    console.error("Error removing member:", err.message);
+    res.status(500).send("Server error");
   }
 });
 

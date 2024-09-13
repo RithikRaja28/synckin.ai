@@ -20,11 +20,14 @@ import {
 } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
 import DeleteIcon from "@mui/icons-material/Delete";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 
 const FamilyDetails = () => {
   const [family, setFamily] = useState(null);
   const [error, setError] = useState("");
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [openRemoveMemberDialog, setOpenRemoveMemberDialog] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
@@ -60,7 +63,8 @@ const FamilyDetails = () => {
         message: "Family deleted successfully",
         type: "success",
       });
-      setFamily(null); // Clear family from state after deletion
+      setFamily(null);
+       // Clear family from state after deletion
     } catch (err) {
       setSnackbar({
         open: true,
@@ -71,13 +75,44 @@ const FamilyDetails = () => {
     setOpenDeleteDialog(false);
   };
 
+  // Handle remove member
+  const handleRemoveMember = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete("http://localhost:5000/api/family/remove-member", {
+        headers: { "x-auth-token": token },
+        data: { _id: selectedMember }, // Send _id in the request body
+      });
+      setSnackbar({
+        open: true,
+        message: "Member removed successfully",
+        type: "success",
+      });
+      fetchFamily(); // Refresh family details
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Error removing member",
+        type: "error",
+      });
+    }
+    setOpenRemoveMemberDialog(false);
+  };
+
+
+
   useEffect(() => {
     fetchFamily();
   }, []);
 
-  // Handle opening and closing delete dialog
+  // Handle opening and closing dialogs
   const handleOpenDeleteDialog = () => setOpenDeleteDialog(true);
   const handleCloseDeleteDialog = () => setOpenDeleteDialog(false);
+  const handleOpenRemoveMemberDialog = (memberId) => {
+    setSelectedMember(memberId);
+    setOpenRemoveMemberDialog(true);
+  };
+  const handleCloseRemoveMemberDialog = () => setOpenRemoveMemberDialog(false);
 
   // Handle closing the snackbar
   const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
@@ -108,6 +143,19 @@ const FamilyDetails = () => {
                   primary={`${member.userId.username}`}
                   secondary={`Role: ${member.role}`}
                 />
+                {member.role !== "Parent" && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    startIcon={<PersonRemoveIcon />}
+                    onClick={() =>
+                      handleOpenRemoveMemberDialog(member.userId._id)
+                    }
+                    sx={{ marginLeft: 2 }}
+                  >
+                    Remove
+                  </Button>
+                )}
               </ListItem>
             ))}
           </List>
@@ -144,6 +192,32 @@ const FamilyDetails = () => {
             variant="contained"
           >
             Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Remove Member Confirmation Dialog */}
+      <Dialog
+        open={openRemoveMemberDialog}
+        onClose={handleCloseRemoveMemberDialog}
+      >
+        <DialogTitle>Remove Member</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to remove this member from the family? This
+            action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseRemoveMemberDialog} color="primary">
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRemoveMember}
+            color="error"
+            variant="contained"
+          >
+            Remove
           </Button>
         </DialogActions>
       </Dialog>

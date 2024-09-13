@@ -21,15 +21,12 @@ const DebtChart = ({ debts }) => {
               data: debts.map((debt) => debt.amount),
               backgroundColor: [
                 "#4E79A7", // Soft blue
-                "#AF7AA1", // Light purple
-
-                "#E15759", // Warm red
-                "#76B7B2", // Cool teal
-                "#59A14F", // Fresh green
-                "#EDC949", // Golden yellow
                 "#FF9DA7", // Soft pink
+                "#EDC949", // Golden yellow
+                "#59A14F", // Fresh green
                 "#9C755F", // Earthy brown
                 "#BAB0AC", // Neutral grey
+
               ],
               borderWidth: 1,
             },
