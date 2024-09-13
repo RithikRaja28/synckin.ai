@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  Container,
+  Grid,
+  Paper,
+  TextField,
+  Button,
+  Typography,
+  Card,
+  CardContent,
+  IconButton,
+} from "@mui/material";
 import { FaEdit, FaTrash, FaCalendarAlt, FaListUl } from "react-icons/fa";
 
 const InventoryManager = () => {
@@ -97,117 +107,123 @@ const InventoryManager = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row">
-        <div className="col-md-4">
-          <div className="card shadow-lg mb-4">
-            <div className="card-body">
-              <h4 className="text-muted">
-                {isEditing ? "Edit Item" : "Add New Item"}
-              </h4>
-              <div className="form-group mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Name"
-                  value={newItem.name}
-                  onChange={(e) =>
-                    setNewItem({ ...newItem, name: e.target.value })
-                  }
-                />
-              </div>
-              <div className="form-group mb-3">
-                <input
-                  type="number"
-                  className="form-control"
-                  placeholder="Quantity"
-                  value={newItem.quantity}
-                  onChange={(e) =>
-                    setNewItem({ ...newItem, quantity: e.target.value })
-                  }
-                />
-              </div>
-              <div className="form-group mb-3">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Description"
-                  value={newItem.description}
-                  onChange={(e) =>
-                    setNewItem({ ...newItem, description: e.target.value })
-                  }
-                />
-              </div>
-              <div className="form-group mb-3">
-                <input
-                  type="date"
-                  className="form-control"
-                  value={newItem.dueDate}
-                  onChange={(e) =>
-                    setNewItem({ ...newItem, dueDate: e.target.value })
-                  }
-                />
-              </div>
-              <button
-                className="btn btn-primary w-100 mt-3 rounded-pill"
-                onClick={isEditing ? handleUpdateItem : handleAddItem}
-              >
-                {isEditing ? "Update Item" : "Add Item"}
-              </button>
-            </div>
-          </div>
-        </div>
-        <div className="col-md-8">
-          <div className="card shadow-lg">
-            <div className="card-body">
-              <h4 className="text-muted">Your Inventory Items</h4>
-              <div className="list-group">
-                {inventoryItems.map((item) => (
-                  <div
-                    key={item._id}
-                    className="card mb-3 shadow-sm p-3 rounded"
-                    style={{ backgroundColor: "#f8f9fa", transition: "0.3s" }}
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Grid container spacing={4}>
+        {/* Form Section */}
+        <Grid item xs={12} md={4}>
+          <Paper elevation={3} sx={{ padding: 3, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              {isEditing ? "Edit Item" : "Add New Item"}
+            </Typography>
+            <TextField
+              fullWidth
+              label="Name"
+              variant="outlined"
+              margin="normal"
+              value={newItem.name}
+              onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+            />
+            <TextField
+              fullWidth
+              label="Quantity"
+              type="number"
+              variant="outlined"
+              margin="normal"
+              value={newItem.quantity}
+              onChange={(e) =>
+                setNewItem({ ...newItem, quantity: e.target.value })
+              }
+            />
+            <TextField
+              fullWidth
+              label="Description"
+              variant="outlined"
+              margin="normal"
+              value={newItem.description}
+              onChange={(e) =>
+                setNewItem({ ...newItem, description: e.target.value })
+              }
+            />
+            <TextField
+              fullWidth
+              label="Due Date"
+              type="date"
+              variant="outlined"
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+              value={newItem.dueDate}
+              onChange={(e) =>
+                setNewItem({ ...newItem, dueDate: e.target.value })
+              }
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={isEditing ? handleUpdateItem : handleAddItem}
+            >
+              {isEditing ? "Update Item" : "Add Item"}
+            </Button>
+          </Paper>
+        </Grid>
+
+        {/* Inventory List Section */}
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} sx={{ padding: 3, borderRadius: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Your Inventory Items
+            </Typography>
+            {inventoryItems.length === 0 ? (
+              <Typography>No items available</Typography>
+            ) : (
+              inventoryItems.map((item) => (
+                <Card key={item._id} variant="outlined" sx={{ mb: 2 }}>
+                  <CardContent
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
                   >
-                    <div className="card-body d-flex justify-content-between align-items-center">
-                      <div>
-                        <h5 className="mb-1">
-                          <strong>{item.name}</strong>
-                        </h5>
-                        <p className="mb-1 text-secondary">
-                          <FaListUl className="me-2" />
-                          {item.quantity} items
-                        </p>
-                        <p className="mb-1 text-secondary">
-                          <FaCalendarAlt className="me-2" />
-                          Due: {new Date(item.dueDate).toLocaleDateString()}
-                        </p>
-                        <p className="mb-0 text-secondary">
-                          {item.description}
-                        </p>
-                      </div>
-                      <div>
-                        <button
-                          className="btn btn-info btn-sm me-2"
-                          onClick={() => handleEditItem(item)}
-                        >
-                          <FaEdit /> Edit
-                        </button>
-                        <button
-                          className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteItem(item._id)}
-                        >
-                          <FaTrash /> Delete
-                        </button>
-                      </div>
+                    <div>
+                      <Typography variant="h6">
+                        <strong>{item.name}</strong>
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        <FaListUl style={{ marginRight: 4 }} />
+                        {item.quantity} items
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        <FaCalendarAlt style={{ marginRight: 4 }} />
+                        Due: {new Date(item.dueDate).toLocaleDateString()}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary">
+                        {item.description}
+                      </Typography>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+                    <div>
+                      <IconButton
+                        color="info"
+                        onClick={() => handleEditItem(item)}
+                      >
+                        <FaEdit />
+                      </IconButton>
+                      <IconButton
+                        color="error"
+                        onClick={() => handleDeleteItem(item._id)}
+                      >
+                        <FaTrash />
+                      </IconButton>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
+    </Container>
   );
 };
 

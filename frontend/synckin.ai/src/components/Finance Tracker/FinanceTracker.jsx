@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Button, Container, Paper, Tabs, Tab } from "@mui/material";
 import {
   FaMoneyBillWave,
   FaPiggyBank,
@@ -30,58 +30,68 @@ const FinanceTracker = () => {
   };
 
   return (
-    <div className="container mt-2 p-4">
-      {/* Buttons on the top */}
-      <div className="d-flex justify-content-around mb-5">
-        <button
-          className={`btn btn-light btn-lg ${
-            activeSection === "income" ? "active btn-primary text-white" : ""
-          }`}
-          style={{ width: "150px", borderRadius: "30px" }}
-          onClick={() => setActiveSection("income")}
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* Tabs for section navigation */}
+      <Paper elevation={3} sx={{ borderRadius: "16px", mb: 4 }}>
+        <Tabs
+          value={activeSection}
+          onChange={(event, newValue) => setActiveSection(newValue)}
+          textColor="primary"
+          indicatorColor="primary"
+          variant="fullWidth"
+          aria-label="Finance Tracker Tabs"
         >
-          <FaMoneyBillWave className="me-2" /> Income
-        </button>
-        <button
-          className={`btn btn-light btn-lg ${
-            activeSection === "expense" ? "active btn-primary text-white" : ""
-          }`}
-          style={{ width: "150px", borderRadius: "30px" }}
-          onClick={() => setActiveSection("expense")}
-        >
-          <FaShoppingCart className="me-2" /> Expense
-        </button>
-        <button
-          className={`btn btn-light btn-lg ${
-            activeSection === "savings" ? "active btn-primary text-white" : ""
-          }`}
-          style={{ width: "150px", borderRadius: "30px" }}
-          onClick={() => setActiveSection("savings")}
-        >
-          <FaPiggyBank className="me-2" /> Savings
-        </button>
-        <button
-          className={`btn btn-light btn-lg ${
-            activeSection === "debt" ? "active btn-primary text-white" : ""
-          }`}
-          style={{ width: "150px", borderRadius: "30px" }}
-          onClick={() => setActiveSection("debt")}
-        >
-          <FaHandHoldingUsd className="me-2" /> Debt
-        </button>
-      </div>
+          <Tab
+            value="income"
+            label={
+              <>
+                <FaMoneyBillWave style={{ marginRight: 8 }} /> Income
+              </>
+            }
+            sx={{ fontWeight: "bold" }}
+          />
+          <Tab
+            value="expense"
+            label={
+              <>
+                <FaShoppingCart style={{ marginRight: 8 }} /> Expense
+              </>
+            }
+            sx={{ fontWeight: "bold" }}
+          />
+          <Tab
+            value="savings"
+            label={
+              <>
+                <FaPiggyBank style={{ marginRight: 8 }} /> Savings
+              </>
+            }
+            sx={{ fontWeight: "bold" }}
+          />
+          <Tab
+            value="debt"
+            label={
+              <>
+                <FaHandHoldingUsd style={{ marginRight: 8 }} /> Debt
+              </>
+            }
+            sx={{ fontWeight: "bold" }}
+          />
+        </Tabs>
+      </Paper>
 
-      {/* Content rendering below the buttons */}
-      <div
-        className="card mb-4 p-4"
-        style={{
-          borderRadius: "10px",
-          boxShadow: "0px 0px 10px rgba(0, 0, 0, 0.05)",
+      {/* Content rendering below the tabs */}
+      <Paper
+        elevation={3}
+        sx={{
+          borderRadius: "16px",
+          p: 4,
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >
         {renderContent()}
-      </div>
-    </div>
+      </Paper>
+    </Container>
   );
 };
 

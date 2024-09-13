@@ -1,9 +1,22 @@
-// SavingsPage.js
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 import SavingsChart from "./utils/SavingsChart"; // Import the separated chart component
+import {
+  Container,
+  Card,
+  CardContent,
+  CardActions,
+  Button,
+  Typography,
+  Grid,
+  Box,
+  TextField,
+  MenuItem,
+  Switch,
+  FormControlLabel,
+  InputAdornment,
+} from "@mui/material";
 
 const SavingsPage = () => {
   const [savings, setSavings] = useState([]);
@@ -105,196 +118,203 @@ const SavingsPage = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="header-custom">Your Savings Goals</h4>
-        <button
-          className="btn btn-primary rounded-pill mb-3"
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center">
+        <Typography variant="h4" gutterBottom>
+          Your Savings Goals
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<FaPlus />}
           onClick={() => {
             setFormVisible(!formVisible);
             setEditing(null);
           }}
         >
-          <FaPlus /> {formVisible ? "Cancel" : "Add Saving Goal"}
-        </button>
-      </div>
+          {formVisible ? "Cancel" : "Add Saving Goal"}
+        </Button>
+      </Box>
+
       {formVisible && (
-        <div className="card mb-5 shadow-sm rounded-3">
-          <div className="card-body p-4">
-            <h5 className="card-title mb-4">
+        <Card sx={{ mb: 4 }}>
+          <CardContent>
+            <Typography variant="h5" mb={2}>
               {editing ? "Edit Saving Goal" : "Add New Saving Goal"}
-            </h5>
+            </Typography>
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="goal" className="form-label">
-                  Goal
-                </label>
-                <input
-                  type="text"
-                  id="goal"
-                  name="goal"
-                  className="form-control"
-                  placeholder="Enter saving goal"
-                  value={formData.goal}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="targetAmount" className="form-label">
-                  Target Amount
-                </label>
-                <input
-                  type="number"
-                  id="targetAmount"
-                  name="targetAmount"
-                  className="form-control"
-                  placeholder="Enter target amount"
-                  value={formData.targetAmount}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="currentAmount" className="form-label">
-                  Current Amount
-                </label>
-                <input
-                  type="number"
-                  id="currentAmount"
-                  name="currentAmount"
-                  className="form-control"
-                  placeholder="Enter current amount"
-                  value={formData.currentAmount}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="targetDate" className="form-label">
-                  Target Date
-                </label>
-                <input
-                  type="date"
-                  id="targetDate"
-                  name="targetDate"
-                  className="form-control"
-                  value={formData.targetDate}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <input
-                  type="checkbox"
-                  id="hasInterestRate"
-                  name="hasInterestRate"
-                  className="form-check-input"
-                  checked={formData.hasInterestRate}
-                  onChange={handleChange}
-                />
-                <label
-                  htmlFor="hasInterestRate"
-                  className="form-check-label ms-2"
-                >
-                  Add Interest Rate
-                </label>
-              </div>
-              {formData.hasInterestRate && (
-                <div className="mb-3">
-                  <label htmlFor="interestRate" className="form-label">
-                    Interest Rate (%)
-                  </label>
-                  <input
-                    type="number"
-                    id="interestRate"
-                    name="interestRate"
-                    className="form-control"
-                    placeholder="Enter interest rate"
-                    value={formData.interestRate}
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Goal"
+                    name="goal"
+                    value={formData.goal}
                     onChange={handleChange}
-                    step="0.01"
-                    min="0"
+                    required
                   />
-                </div>
-              )}
-              <div className="mb-4">
-                <label htmlFor="frequency" className="form-label">
-                  Frequency
-                </label>
-                <select
-                  id="frequency"
-                  name="frequency"
-                  className="form-select"
-                  value={formData.frequency}
-                  onChange={handleChange}
-                  required
-                >
-                  <option value="Monthly">Monthly</option>
-                  <option value="Annually">Annually</option>
-                </select>
-              </div>
-              <button
-                type="submit"
-                className="btn btn-primary rounded-pill px-4"
-              >
-                {editing ? "Update Saving Goal" : "Add Saving Goal"}
-              </button>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Target Amount"
+                    name="targetAmount"
+                    type="number"
+                    value={formData.targetAmount}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">₹</InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Current Amount"
+                    name="currentAmount"
+                    type="number"
+                    value={formData.currentAmount}
+                    onChange={handleChange}
+                    required
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">₹</InputAdornment>
+                      ),
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Target Date"
+                    name="targetDate"
+                    type="date"
+                    value={formData.targetDate}
+                    onChange={handleChange}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={formData.hasInterestRate}
+                        onChange={handleChange}
+                        name="hasInterestRate"
+                      />
+                    }
+                    label="Add Interest Rate"
+                  />
+                </Grid>
+                {formData.hasInterestRate && (
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      label="Interest Rate (%)"
+                      name="interestRate"
+                      type="number"
+                      value={formData.interestRate}
+                      onChange={handleChange}
+                      InputProps={{
+                        endAdornment: (
+                          <InputAdornment position="end">%</InputAdornment>
+                        ),
+                      }}
+                      required
+                    />
+                  </Grid>
+                )}
+                <Grid item xs={12}>
+                  <TextField
+                    select
+                    fullWidth
+                    label="Frequency"
+                    name="frequency"
+                    value={formData.frequency}
+                    onChange={handleChange}
+                    required
+                  >
+                    <MenuItem value="Monthly">Monthly</MenuItem>
+                    <MenuItem value="Annually">Annually</MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item xs={12}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    fullWidth
+                  >
+                    {editing ? "Update Saving Goal" : "Add Saving Goal"}
+                  </Button>
+                </Grid>
+              </Grid>
             </form>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
-      <h5 className="mb-4">Savings Goals Overview</h5>
-      <SavingsChart savings={savings} />{" "}
-      {/* Use the separated chart component */}
-      <h5>Savings Goals List</h5>
-      <div className="row">
+
+      <SavingsChart savings={savings} />
+
+      <Typography variant="h5" gutterBottom className="mt-5 mb-3">
+        Savings Goals List
+      </Typography>
+      <Grid container spacing={3}>
         {savings.map((saving) => (
-          <div key={saving._id} className="col-md-4 mb-3">
-            <div className="card h-100 shadow-sm rounded-3">
-              <div className="card-body d-flex flex-column p-4">
-                <h6 className="card-title">{saving.goal}</h6>
-                <p className="card-text mb-1">
+          <Grid item key={saving._id} xs={12} sm={6} md={4}>
+            <Card elevation={3}>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  {saving.goal}
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
                   Target Amount: ₹
                   {new Intl.NumberFormat().format(saving.targetAmount)}
-                </p>
-                <p className="card-text mb-1">
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
                   Current Amount: ₹
                   {new Intl.NumberFormat().format(saving.currentAmount)}
-                </p>
-                <p className="card-text mb-1">
+                </Typography>
+                <Typography variant="body2" color="textSecondary">
                   Target Date:{" "}
                   {new Date(saving.targetDate).toLocaleDateString()}
-                </p>
+                </Typography>
                 {saving.interestRate > 0 && (
-                  <p className="card-text mb-1">
+                  <Typography variant="body2" color="textSecondary">
                     Interest Rate: {saving.interestRate}%
-                  </p>
+                  </Typography>
                 )}
-                <p className="card-text mb-4">Frequency: {saving.frequency}</p>
-                <div className="mt-auto d-flex">
-                  <button
-                    className="btn mb-2 me-2"
-                    style={{ backgroundColor: "#17a2b8", color: "white" }}
-                    onClick={() => handleEdit(saving)}
-                  >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    className="btn btn-danger mb-2"
-                    onClick={() => handleDelete(saving._id)}
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+                <Typography variant="body2" color="textSecondary" gutterBottom>
+                  Frequency: {saving.frequency}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button
+                  size="small"
+                  color="primary"
+                  onClick={() => handleEdit(saving)}
+                  startIcon={<FaEdit />}
+                >
+                  Edit
+                </Button>
+                <Button
+                  size="small"
+                  color="secondary"
+                  onClick={() => handleDelete(saving._id)}
+                  startIcon={<FaTrash />}
+                >
+                  Delete
+                </Button>
+              </CardActions>
+            </Card>
+          </Grid>
         ))}
-      </div>
-    </div>
+      </Grid>
+    </Container>
   );
 };
 

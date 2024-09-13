@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import DebtChart from "./utils/DebtChart"; // Import the DebtChart component
-import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  Box,
+  Card,
+  CardContent,
+  Grid,
+  TextField,
+  Button,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
 
 const Debt = () => {
@@ -22,7 +32,6 @@ const Debt = () => {
       const res = await axios.get("http://localhost:5000/api/debt/show", {
         headers: { "x-auth-token": localStorage.getItem("token") },
       });
-
       setDebts(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -93,183 +102,175 @@ const Debt = () => {
     }).format(amount);
   };
 
-  // Calculate chart data
-  const chartData = {
-    labels: debts.map((debt) => debt.name),
-    datasets: [
-      {
-        data: debts.map((debt) => debt.amount),
-        backgroundColor: [
-          "#007bff",
-          "#28a745",
-          "#ffc107",
-          "#dc3545",
-          "#17a2b8",
-        ],
-        hoverBackgroundColor: [
-          "#0056b3",
-          "#19692c",
-          "#e0a800",
-          "#b21f2d",
-          "#117a8b",
-        ],
-      },
-    ],
-  };
-
   return (
-    <div className="container my-5">
-      <div className="row">
-        <div className="col-md-6">
-          <h2 className="mb-4">{isEditing ? "Edit Debt" : "Add Debt"}</h2>
-          <form
-            onSubmit={handleSubmit}
-            className="bg-light p-4 rounded shadow-sm"
-          >
-            <div className="form-group">
-              <label>Name:</label>
-              <input
-                type="text"
+    <Box sx={{ padding: 4 }}>
+      <Grid container spacing={4}>
+        {/* Debt Form */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={3} sx={{ padding: 3, borderRadius: 3 }}>
+            <Typography variant="h5" gutterBottom>
+              {isEditing ? "Edit Debt" : "Add Debt"}
+            </Typography>
+            <form onSubmit={handleSubmit}>
+              <TextField
+                label="Name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                className="form-control"
+                fullWidth
+                margin="normal"
                 required
               />
-            </div>
-            <div className="form-group">
-              <label>Amount:</label>
-              <input
-                type="number"
+              <TextField
+                label="Amount"
                 name="amount"
+                type="number"
                 value={formData.amount}
                 onChange={handleInputChange}
-                className="form-control"
+                fullWidth
+                margin="normal"
                 required
               />
-            </div>
-            <div className="form-group">
-              <label>Due Date:</label>
-              <input
-                type="date"
+              <TextField
+                label="Due Date"
                 name="dueDate"
+                type="date"
                 value={formData.dueDate}
                 onChange={handleInputChange}
-                className="form-control"
+                fullWidth
+                margin="normal"
+                InputLabelProps={{ shrink: true }}
               />
-            </div>
-            <div className="form-group">
-              <label>Minimum Payment:</label>
-              <input
-                type="number"
+              <TextField
+                label="Minimum Payment"
                 name="minimumPayment"
+                type="number"
                 value={formData.minimumPayment}
                 onChange={handleInputChange}
-                className="form-control"
+                fullWidth
+                margin="normal"
               />
-            </div>
-            <div className="form-group form-check">
-              <label>
-                <input
-                  type="checkbox"
-                  name="isInterestApplicable"
-                  checked={formData.isInterestApplicable}
-                  onChange={handleInputChange}
-                  className="form-check-input"
-                />
-                Is Interest Applicable?
-              </label>
-            </div>
-            {formData.isInterestApplicable && (
-              <>
-                <div className="form-group">
-                  <label>Interest Rate (%):</label>
-                  <input
-                    type="number"
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    name="isInterestApplicable"
+                    checked={formData.isInterestApplicable}
+                    onChange={handleInputChange}
+                  />
+                }
+                label="Is Interest Applicable?"
+              />
+              {formData.isInterestApplicable && (
+                <>
+                  <TextField
+                    label="Interest Rate (%)"
                     name="interestRate"
+                    type="number"
                     value={formData.interestRate}
                     onChange={handleInputChange}
-                    className="form-control"
+                    fullWidth
+                    margin="normal"
                   />
-                </div>
-                <div className="form-group">
-                  <label>Total Amount:</label>
-                  <input
-                    type="number"
+                  <TextField
+                    label="Total Amount"
                     value={formatCurrency(
                       parseFloat(formData.amount) +
                         parseFloat(formData.amount) *
                           (parseFloat(formData.interestRate) / 100)
                     )}
-                    readOnly
-                    className="form-control"
+                    fullWidth
+                    margin="normal"
+                    InputProps={{
+                      readOnly: true,
+                    }}
                   />
-                </div>
-              </>
-            )}
-            <button type="submit" className="btn btn-primary mt-3">
-              {isEditing ? "Update Debt" : "Add Debt"}
-            </button>
-          </form>
-        </div>
+                </>
+              )}
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                startIcon={isEditing ? <FaEdit /> : <FaPlus />}
+                sx={{ mt: 2 }}
+              >
+                {isEditing ? "Update Debt" : "Add Debt"}
+              </Button>
+            </form>
+          </Card>
+        </Grid>
 
-        <div className="col-md-6">
-          <h2 className="mb-4">Debt Distribution</h2>
-          <div className="bg-light p-4 rounded shadow-sm">
+        {/* Debt Chart */}
+        <Grid item xs={12} md={6}>
+          <Card elevation={3} sx={{ padding: 3, borderRadius: 3 }}>
+            <Typography variant="h5" gutterBottom>
+              Debt Distribution
+            </Typography>
             <DebtChart debts={debts} />
-          </div>
-        </div>
-      </div>
+          </Card>
+        </Grid>
+      </Grid>
 
-      <h2 className="mt-5">Existing Debts</h2>
-      <div className="row">
-        {debts.map((debt) => (
-          <div className="col-md-4 mb-4" key={debt._id}>
-            <div className="card h-100">
-              <div className="card-body">
-                <h5 className="card-title">{debt.name}</h5>
-                <p className="card-text">
-                  Amount: {formatCurrency(debt.amount)}
-                </p>
-                {debt.isInterestApplicable && (
-                  <>
-                    <p className="card-text">
-                      Interest Rate: {debt.interestRate}%
-                    </p>
-                    <p className="card-text">
-                      Total Amount:{" "}
-                      {formatCurrency(
-                        parseFloat(debt.amount) +
-                          parseFloat(debt.amount) *
-                            (parseFloat(debt.interestRate) / 100)
-                      )}
-                    </p>
-                  </>
-                )}
-                <p className="card-text">
-                  Due Date: {new Date(debt.dueDate).toLocaleDateString()}
-                </p>
-                <div className="d-flex justify-content-between">
-                  <button
-                    onClick={() => handleEdit(debt)}
-                    className="btn"
-                    style={{ backgroundColor: "#17a2b8", color: "white" }}
+      {/* Existing Debts List */}
+      <Box sx={{ mt: 5 }}>
+        <Typography variant="h5" gutterBottom>
+          Existing Debts
+        </Typography>
+        <Grid container spacing={4}>
+          {debts.map((debt) => (
+            <Grid item xs={12} md={4} key={debt._id}>
+              <Card elevation={2} sx={{ borderRadius: 3, height: "100%" }}>
+                <CardContent>
+                  <Typography variant="h6">{debt.name}</Typography>
+                  <Typography>Amount: {formatCurrency(debt.amount)}</Typography>
+                  {debt.isInterestApplicable && (
+                    <>
+                      <Typography>
+                        Interest Rate: {debt.interestRate}%
+                      </Typography>
+                      <Typography>
+                        Total Amount:{" "}
+                        {formatCurrency(
+                          parseFloat(debt.amount) +
+                            parseFloat(debt.amount) *
+                              (parseFloat(debt.interestRate) / 100)
+                        )}
+                      </Typography>
+                    </>
+                  )}
+                  <Typography>
+                    Due Date: {new Date(debt.dueDate).toLocaleDateString()}
+                  </Typography>
+                  <Box
+                    sx={{
+                      mt: 2,
+                      display: "flex",
+                      justifyContent: "space-between",
+                    }}
                   >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(debt._id)}
-                    className="btn btn-danger"
-                  >
-                    <FaTrash /> Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+                    <Button
+                      variant="outlined"
+                      color="info"
+                      startIcon={<FaEdit />}
+                      onClick={() => handleEdit(debt)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      startIcon={<FaTrash />}
+                      onClick={() => handleDelete(debt._id)}
+                    >
+                      Delete
+                    </Button>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Box>
   );
 };
 

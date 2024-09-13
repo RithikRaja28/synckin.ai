@@ -20,44 +20,39 @@ const DebtChart = ({ debts }) => {
               label: "Debt Amount",
               data: debts.map((debt) => debt.amount),
               backgroundColor: [
-                "#007bff",
-                "#28a745",
-                "#ffc107",
-                "#dc3545",
-                "#17a2b8",
+                "#4E79A7", // Soft blue
+                "#AF7AA1", // Light purple
+
+                "#E15759", // Warm red
+                "#76B7B2", // Cool teal
+                "#59A14F", // Fresh green
+                "#EDC949", // Golden yellow
+                "#FF9DA7", // Soft pink
+                "#9C755F", // Earthy brown
+                "#BAB0AC", // Neutral grey
               ],
-              hoverBackgroundColor: [
-                "#0056b3",
-                "#19692c",
-                "#e0a800",
-                "#b21f2d",
-                "#117a8b",
-              ],
+              borderWidth: 1,
             },
           ],
         },
         options: {
           responsive: true,
-          maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: function (context) {
+                  const value = context.raw;
+                  return `INR ${value.toLocaleString("en-IN")}`;
+                },
+              },
+            },
+          },
         },
       });
     }
-
-    return () => {
-      if (chartInstanceRef.current) {
-        chartInstanceRef.current.destroy();
-      }
-    };
   }, [debts]);
 
-  return (
-    <div
-      className="chart-container mb-4 p-3 bg-white rounded shadow"
-      style={{ height: "400px" }}
-    >
-      <canvas ref={chartRef}></canvas>
-    </div>
-  );
+  return <canvas ref={chartRef}></canvas>;
 };
 
 export default DebtChart;
