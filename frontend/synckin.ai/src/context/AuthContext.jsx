@@ -58,12 +58,13 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (username, email, password) => {
+  const register = async (username, email, password,role) => {
     try {
       const res = await axios.post("http://localhost:5000/auth/register", {
         username,
         email,
         password,
+        role
       });
       localStorage.setItem("token", res.data.token);
       // Fetch user details immediately after registration
