@@ -1,8 +1,26 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import "bootstrap/dist/css/bootstrap.min.css";
+import {
+  TextField,
+  Button,
+  Select,
+  MenuItem,
+  Card,
+  CardContent,
+  Typography,
+  CircularProgress,
+  Alert,
+  IconButton,
+  Snackbar,
+} from "@mui/material";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-import "./TaskManager.css";
+import { styled } from "@mui/material/styles";
+
+// Custom Styled Components
+const StyledCard = styled(Card)({
+  borderRadius: 15,
+  boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.1)",
+});
 
 const TaskManager = () => {
   const [tasks, setTasks] = useState([]);
@@ -20,6 +38,8 @@ const TaskManager = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filterStatus, setFilterStatus] = useState("All");
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
 
   useEffect(() => {
     fetchTasks();
@@ -57,10 +77,6 @@ const TaskManager = () => {
     setError("");
 
     try {
-      const temporaryId = Date.now();
-      const temporaryTask = { ...newTask, _id: temporaryId };
-      setTasks([...tasks, temporaryTask]);
-
       const response = await axios.post(
         "http://localhost:5000/api/tasks/add",
         newTask,
@@ -68,15 +84,13 @@ const TaskManager = () => {
           headers: { "x-auth-token": token },
         }
       );
-      setTasks(
-        tasks.map((task) => (task._id === temporaryId ? response.data : task))
-      );
-      fetchTasks();
+      setTasks([...tasks, response.data]);
       resetTaskForm();
+      setSnackbarMessage("Task added successfully!");
+      setSnackbarOpen(true);
       setLoading(false);
     } catch (error) {
       setError("Failed to add task. Please try again.");
-      setTasks(tasks.filter((task) => task._id !== temporaryId));
       setLoading(false);
     }
   };
@@ -89,17 +103,16 @@ const TaskManager = () => {
     setLoading(true);
     setError("");
 
-    const originalTasks = tasks;
-    setTasks(tasks.filter((task) => task._id !== id));
-
     try {
       await axios.delete(`http://localhost:5000/api/tasks/delete/${id}`, {
         headers: { "x-auth-token": token },
       });
+      setTasks(tasks.filter((task) => task._id !== id));
+      setSnackbarMessage("Task deleted successfully!");
+      setSnackbarOpen(true);
       setLoading(false);
     } catch (error) {
       setError("Failed to delete task. Please try again.");
-      setTasks(originalTasks);
       setLoading(false);
     }
   };
@@ -140,6 +153,8 @@ const TaskManager = () => {
         tasks.map((task) => (task._id === editingTaskId ? response.data : task))
       );
       resetTaskForm();
+      setSnackbarMessage("Task updated successfully!");
+      setSnackbarOpen(true);
       setLoading(false);
     } catch (error) {
       setError("Failed to update task. Please try again.");
@@ -170,146 +185,157 @@ const TaskManager = () => {
   };
 
   return (
-    <div className="container-custom mt-5">
+    <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="header-custom">Your Tasks</h4>
-        <button
-          className="btn btn-primary btn-custom rounded-pill"
+        <Typography variant="h4">Your Tasks</Typography>
+        <Button
+          variant="contained"
+          color="primary"
           onClick={() => setShowForm(!showForm)}
+          startIcon={<FaPlus />}
         >
-          <FaPlus /> {showForm ? "Hide Form" : "Add Task"}
-        </button>
+          {showForm ? "Hide Form" : "Add Task"}
+        </Button>
       </div>
 
-      {loading && <div className="alert alert-info">Loading...</div>}
-      {error && <div className="alert alert-danger">{error}</div>}
+      {loading && <CircularProgress />}
+      {error && <Alert severity="error">{error}</Alert>}
 
       {showForm && (
-        <div className="card card-custom p-4 mb-4">
-          <div className="form-group">
-            <label>Task Name</label>
-            <input
-              type="text"
-              className="form-control"
+        <StyledCard className="mb-4">
+          <CardContent>
+            <Typography variant="h6" className="mb-3">
+              {isEditing ? "Edit Task" : "Add New Task"}
+            </Typography>
+            <TextField
+              label="Task Name"
+              fullWidth
+              margin="normal"
               value={newTask.taskName}
               onChange={(e) =>
                 setNewTask({ ...newTask, taskName: e.target.value })
               }
               required
             />
-          </div>
-          <div className="form-group">
-            <label>Description</label>
-            <input
-              type="text"
-              className="form-control"
+            <TextField
+              label="Description"
+              fullWidth
+              margin="normal"
               value={newTask.description}
               onChange={(e) =>
                 setNewTask({ ...newTask, description: e.target.value })
               }
             />
-          </div>
-          <div className="form-group">
-            <label>Due Date</label>
-            <input
+            <TextField
+              label="Due Date"
               type="date"
-              className="form-control"
+              fullWidth
+              margin="normal"
               value={newTask.dueDate}
               onChange={(e) =>
                 setNewTask({ ...newTask, dueDate: e.target.value })
               }
               required
+              InputLabelProps={{ shrink: true }}
             />
-          </div>
-          <div className="form-group">
-            <label>Priority</label>
-            <select
-              className="form-control"
+            <Select
+              fullWidth
+              margin="normal"
               value={newTask.priority}
               onChange={(e) =>
                 setNewTask({ ...newTask, priority: e.target.value })
               }
+              displayEmpty
             >
-              <option>Low</option>
-              <option>Medium</option>
-              <option>High</option>
-            </select>
-          </div>
-          <div className="form-group">
-            <label>Status</label>
-            <select
-              className="form-control"
+              <MenuItem value="Low">Low</MenuItem>
+              <MenuItem value="Medium">Medium</MenuItem>
+              <MenuItem value="High">High</MenuItem>
+            </Select>
+            <Select
+              fullWidth
+              margin="normal"
               value={newTask.status}
               onChange={(e) =>
                 setNewTask({ ...newTask, status: e.target.value })
               }
+              displayEmpty
             >
-              <option>Pending</option>
-              <option>In Progress</option>
-              <option>Completed</option>
-            </select>
-          </div>
-          <button
-            className="btn btn-primary btn-custom rounded-pill"
-            onClick={isEditing ? handleUpdateTask : handleAddTask}
-          >
-            {isEditing ? "Update Task" : "Add Task"}
-          </button>
-          <button
-            className="btn btn-secondary btn-custom rounded-pill ml-2 mt-3"
-            onClick={resetTaskForm}
-          >
-            Cancel
-          </button>
-        </div>
+              <MenuItem value="Pending">Pending</MenuItem>
+              <MenuItem value="In Progress">In Progress</MenuItem>
+              <MenuItem value="Completed">Completed</MenuItem>
+            </Select>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              onClick={isEditing ? handleUpdateTask : handleAddTask}
+              className="mt-3"
+            >
+              {isEditing ? "Update Task" : "Add Task"}
+            </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              fullWidth
+              onClick={resetTaskForm}
+              className="mt-2"
+            >
+              Cancel
+            </Button>
+          </CardContent>
+        </StyledCard>
       )}
 
       <div className="d-flex justify-content-between align-items-center mb-3">
-        
-        <select
-          className="form-control w-auto"
+        <Select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
+          displayEmpty
         >
-          <option>All</option>
-          <option>Pending</option>
-          <option>In Progress</option>
-          <option>Completed</option>
-        </select>
-        
+          <MenuItem value="All">All</MenuItem>
+          <MenuItem value="Pending">Pending</MenuItem>
+          <MenuItem value="In Progress">In Progress</MenuItem>
+          <MenuItem value="Completed">Completed</MenuItem>
+        </Select>
       </div>
 
       <ul className="list-unstyled">
         {filteredTasks.map((task) => (
-          <li
-            key={task._id}
-            className="task-item d-flex justify-content-between align-items-center p-3"
-          >
-            <div>
-              <h5 className="header-custom">{task.taskName}</h5>
-              <p>{task.description}</p>
-              <p className="small">
-                Due: {new Date(task.dueDate).toLocaleDateString()} | Priority:{" "}
-                {task.priority} | Status: {task.status}
-              </p>
-            </div>
-            <div>
-              <button
-                className="btn btn-warning btn-sm btn-custom mr-2"
-                onClick={() => handleEditTask(task)}
-              >
-                <FaEdit />
-              </button>
-              <button
-                className="btn btn-danger btn-sm btn-custom ms-3"
-                onClick={() => handleDeleteTask(task._id)}
-              >
-                <FaTrash />
-              </button>
-            </div>
-          </li>
+          <StyledCard key={task._id} className="mb-3">
+            <CardContent className="d-flex justify-content-between align-items-center">
+              <div>
+                <Typography variant="h6">{task.taskName}</Typography>
+                <Typography variant="body2">{task.description}</Typography>
+                <Typography variant="caption" color="textSecondary">
+                  Due: {new Date(task.dueDate).toLocaleDateString()} | Priority:{" "}
+                  {task.priority} | Status: {task.status}
+                </Typography>
+              </div>
+              <div>
+                <IconButton
+                  color="warning"
+                  onClick={() => handleEditTask(task)}
+                >
+                  <FaEdit />
+                </IconButton>
+                <IconButton
+                  color="error"
+                  onClick={() => handleDeleteTask(task._id)}
+                >
+                  <FaTrash />
+                </IconButton>
+              </div>
+            </CardContent>
+          </StyledCard>
         ))}
       </ul>
+
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={() => setSnackbarOpen(false)}
+        message={snackbarMessage}
+      />
     </div>
   );
 };

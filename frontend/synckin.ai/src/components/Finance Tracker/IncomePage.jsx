@@ -1,8 +1,19 @@
-// IncomePage.js
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import IncomeChart from "../Finance Tracker/utils/IncomeChart"; // Import the shared chart component
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import {
+  Button,
+  TextField,
+  Card,
+  CardContent,
+  Typography,
+  Grid,
+  IconButton,
+} from "@mui/material";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IncomeChart from "../Finance Tracker/utils/IncomeChart"; // Import shared chart component
 
 const IncomePage = ({ onIncomeDataUpdate }) => {
   const [incomes, setIncomes] = useState([]);
@@ -90,112 +101,102 @@ const IncomePage = ({ onIncomeDataUpdate }) => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h4 className="header-custom">Your Incomes</h4>
-        <button
-          className="btn btn-primary rounded-pill mb-3"
+        <Typography variant="h4" className="header-custom">
+          Your Incomes
+        </Typography>
+        <Button
+          variant="contained"
+          startIcon={formVisible ? <FaPlus /> : <AddCircleIcon />}
           onClick={() => {
             setFormVisible(!formVisible);
             setEditing(null);
           }}
+          color="primary"
+          style={{ borderRadius: "20px", padding: "8px 16px" }}
         >
-          <FaPlus /> {formVisible ? "Cancel" : "Add Income"}
-        </button>
+          {formVisible ? "Cancel" : "Add Income"}
+        </Button>
       </div>
 
       {formVisible && (
-        <div className="card mb-5 shadow-sm rounded-3">
-          <div className="card-body p-4">
-            <h5 className="card-title mb-4">
+        <Card className="mb-5 shadow-sm" sx={{ borderRadius: 3 }}>
+          <CardContent>
+            <Typography variant="h5" gutterBottom>
               {editing ? "Edit Income" : "Add New Income"}
-            </h5>
+            </Typography>
             <form onSubmit={handleSubmit}>
-              <div className="mb-3">
-                <label htmlFor="source" className="form-label">
-                  Source
-                </label>
-                <input
-                  type="text"
-                  id="source"
-                  name="source"
-                  className="form-control"
-                  placeholder="Enter income source"
-                  value={formData.source}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="mb-3">
-                <label htmlFor="amount" className="form-label">
-                  Amount
-                </label>
-                <input
-                  type="number"
-                  id="amount"
-                  name="amount"
-                  className="form-control"
-                  placeholder="Enter amount"
-                  value={formData.amount}
-                  onChange={handleChange}
-                  required
-                  min="0"
-                />
-              </div>
-              <div className="mb-4">
-                <label htmlFor="category" className="form-label">
-                  Category
-                </label>
-                <input
-                  type="text"
-                  id="category"
-                  name="category"
-                  className="form-control"
-                  placeholder="Enter category"
-                  value={formData.category}
-                  onChange={handleChange}
-                />
-              </div>
-              <button
+              <TextField
+                label="Source"
+                name="source"
+                fullWidth
+                margin="normal"
+                value={formData.source}
+                onChange={handleChange}
+                required
+              />
+              <TextField
+                label="Amount"
+                name="amount"
+                fullWidth
+                margin="normal"
+                type="number"
+                value={formData.amount}
+                onChange={handleChange}
+                required
+              />
+              <TextField
+                label="Category"
+                name="category"
+                fullWidth
+                margin="normal"
+                value={formData.category}
+                onChange={handleChange}
+              />
+              <Button
                 type="submit"
-                className="btn btn-primary rounded-pill px-4"
+                variant="contained"
+                color="primary"
+                sx={{ mt: 2, borderRadius: "20px" }}
               >
                 {editing ? "Update Income" : "Add Income"}
-              </button>
+              </Button>
             </form>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
       )}
 
       <IncomeChart incomes={incomes} />
 
-      <h5 className="mb-4">Income List</h5>
-      <div className="row">
+      <Typography variant="h5" className="mb-4">
+        Income List
+      </Typography>
+      <Grid container spacing={3}>
         {incomes.map((income) => (
-          <div key={income._id} className="col-md-4 mb-3">
-            <div className="card h-100 shadow-sm rounded-3">
-              <div className="card-body d-flex flex-column p-4">
-                <h6 className="card-title">{income.source}</h6>
-                <p className="card-text mb-1">Amount: ${income.amount}</p>
-                <p className="card-text mb-4">Category: {income.category}</p>
-                <div className="mt-auto d-flex">
-                  <button
-                    className="btn mb-2 me-2"
-                    style={{ backgroundColor: "#17a2b8", color: "white" }}
+          <Grid item xs={12} sm={6} md={4} key={income._id}>
+            <Card className="shadow-sm" sx={{ borderRadius: 3 }}>
+              <CardContent>
+                <Typography variant="h6">{income.source}</Typography>
+                <Typography>Amount: ₹{income.amount}</Typography>
+                <Typography>Category: {income.category}</Typography>
+                <div className="mt-3 d-flex justify-content-between">
+                  <IconButton
+                    color="primary"
                     onClick={() => handleEdit(income)}
                   >
-                    <FaEdit /> Edit
-                  </button>
-                  <button
-                    className="btn btn-danger mb-2"
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton
+                    color="secondary"
                     onClick={() => handleDelete(income._id)}
                   >
-                    <FaTrash /> Delete
-                  </button>
+                    <DeleteIcon />
+                  </IconButton>
                 </div>
-              </div>
-            </div>
-          </div>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
+      </Grid>
     </div>
   );
 };
