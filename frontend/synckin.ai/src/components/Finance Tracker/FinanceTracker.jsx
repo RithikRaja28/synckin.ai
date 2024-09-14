@@ -1,15 +1,14 @@
 import React, { useState } from "react";
-import { Button, Container, Paper, Tabs, Tab } from "@mui/material";
+import { Container, Paper, Tabs, Tab, Grid } from "@mui/material";
 import {
   FaMoneyBillWave,
   FaPiggyBank,
   FaShoppingCart,
   FaHandHoldingUsd,
 } from "react-icons/fa";
-import IncomePage from "./IncomePage"; // Assuming this is your Income component
+import IncomePage from "./IncomePage";
 import DebtTracker from "./DebtTracker";
 import SavingsTracker from "./SavingTracker";
-// Import other components like SavingsPage, ExpensePage, DebtPage
 
 const FinanceTracker = () => {
   const [activeSection, setActiveSection] = useState("income");
@@ -32,7 +31,15 @@ const FinanceTracker = () => {
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* Tabs for section navigation */}
-      <Paper elevation={3} sx={{ borderRadius: "16px", mb: 4 }}>
+      <Paper
+        elevation={3}
+        sx={{
+          borderRadius: "16px",
+          mb: 4,
+          p: 2,
+          boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+        }}
+      >
         <Tabs
           value={activeSection}
           onChange={(event, newValue) => setActiveSection(newValue)}
@@ -48,7 +55,7 @@ const FinanceTracker = () => {
                 <FaMoneyBillWave style={{ marginRight: 8 }} /> Income
               </>
             }
-            sx={{ fontWeight: "bold" }}
+            sx={{ fontWeight: "bold", fontSize: { xs: "12px", sm: "16px" } }}
           />
           <Tab
             value="expense"
@@ -57,7 +64,7 @@ const FinanceTracker = () => {
                 <FaShoppingCart style={{ marginRight: 8 }} /> Expense
               </>
             }
-            sx={{ fontWeight: "bold" }}
+            sx={{ fontWeight: "bold", fontSize: { xs: "12px", sm: "16px" } }}
           />
           <Tab
             value="savings"
@@ -66,7 +73,7 @@ const FinanceTracker = () => {
                 <FaPiggyBank style={{ marginRight: 8 }} /> Savings
               </>
             }
-            sx={{ fontWeight: "bold" }}
+            sx={{ fontWeight: "bold", fontSize: { xs: "12px", sm: "16px" } }}
           />
           <Tab
             value="debt"
@@ -75,7 +82,7 @@ const FinanceTracker = () => {
                 <FaHandHoldingUsd style={{ marginRight: 8 }} /> Debt
               </>
             }
-            sx={{ fontWeight: "bold" }}
+            sx={{ fontWeight: "bold", fontSize: { xs: "12px", sm: "16px" } }}
           />
         </Tabs>
       </Paper>
@@ -85,7 +92,7 @@ const FinanceTracker = () => {
         elevation={3}
         sx={{
           borderRadius: "16px",
-          p: 4,
+          p: { xs: 2, sm: 4 },
           boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
         }}
       >

@@ -107,7 +107,7 @@ const InventoryManager = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
+    <Container sx={{ mt: 4 }}>
       <Grid container spacing={4}>
         {/* Form Section */}
         <Grid item xs={12} md={4}>
