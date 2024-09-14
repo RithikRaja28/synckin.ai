@@ -6,15 +6,15 @@ import "./Dashboard.css";
 import { AuthContext } from "../../context/AuthContext";
 import InventoryManager from "../InventoryManagement/InventorySystem";
 import TaskManager from "../TaskManagement/TaskManager";
-import IncomePage from "../Finance Tracker/IncomePage";
 import FinanceTracker from "../Finance Tracker/FinanceTracker";
 import IncomeChart from "../Finance Tracker/utils/IncomeChart";
 import DebtChart from "../Finance Tracker/utils/DebtChart"; // Import the DebtChart
 import axios from "axios";
 import SavingsChart from "../Finance Tracker/utils/SavingsChart";
 import FamilyConnect from "../Family Connect/FamilyConnect";
-import { Grid, Box, Paper } from "@mui/material"; // Import Grid for layout
+import { Grid, Paper } from "@mui/material"; // Import Grid for layout
 import DashboardCard from "./utils/DashboardCard";
+import ProfileDashboard from "../Profile/ProfileDashboard";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [incomes, setIncomes] = useState([]);
   const [debts, setDebts] = useState([]); // State for debts
   const [savings, setSavings] = useState([]);
+  const [showProfile, setShowProfile] = useState(false); // Track profile page
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
@@ -75,6 +76,11 @@ const Dashboard = () => {
       );
   }, []);
 
+  // Handler to switch between main dashboard and profile
+  const handleProfileClick = () => {
+    setShowProfile(true); // Show profile dashboard
+  };
+
   return (
     <div className="d-flex vh-100 w-100">
       <Sidebar />
@@ -85,51 +91,66 @@ const Dashboard = () => {
           transition: "margin-left 0.3s ease-in-out",
         }}
       >
-        <Header />
+        <Header onProfileClick={handleProfileClick} /> {/* Pass handler here */}
         <div className="content p-4">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h1>Welcome to the Dashboard</h1>
-                  {auth.user && <p>Hello, {auth.user.username}</p>}
+          {showProfile ? (
+            // Conditionally render ProfileDashboard
+            <ProfileDashboard />
+          ) : (
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <h1>Welcome to the Dashboard</h1>
+                    {auth.user && <p>Hello, {auth.user.username}</p>}
 
-                  {/* Responsive Grid Layout for the Charts */}
-                  <Grid container spacing={3}>
-                    {/* Income Chart (Left) */}
-                    <Grid item xs={12} md={4}>
-                      <Paper elevation={3} sx={{ padding: 2, height: "100%" }}>
-                        <IncomeChart incomes={incomes} />
-                      </Paper>
-                    </Grid>
+                    {/* Responsive Grid Layout for the Charts */}
+                    <Grid container spacing={3}>
+                      {/* Income Chart (Left) */}
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <IncomeChart incomes={incomes} />
+                        </Paper>
+                      </Grid>
 
-                    {/* Debt Chart (Right) */}
-                    <Grid item xs={12} md={4}>
-                      <Paper elevation={3} sx={{ padding: 2, height: "100%" }}>
-                        <DebtChart debts={debts} />
-                      </Paper>
+                      {/* Debt Chart (Right) */}
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <DebtChart debts={debts} />
+                        </Paper>
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <DashboardCard />
+                        </Paper>
+                      </Grid>
+                      {/* Savings Chart (Full width below) */}
+                      <Grid item xs={12}>
+                        <Paper elevation={3} sx={{ padding: 2 }}>
+                          <SavingsChart savings={savings} />
+                        </Paper>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12} md={4}>
-                      <Paper elevation={3} sx={{ padding: 2, height: "100%" }}>
-                        <DashboardCard />
-                      </Paper>
-                    </Grid>
-                    {/* Savings Chart (Full width below) */}
-                    <Grid item xs={12}>
-                      <Paper elevation={3} sx={{ padding: 2 }}>
-                        <SavingsChart savings={savings} />
-                      </Paper>
-                    </Grid>
-                  </Grid>
-                </div>
-              }
-            />
-            <Route path="/inventorytracker" element={<InventoryManager />} />
-            <Route path="/taskmanager" element={<TaskManager />} />
-            <Route path="/financetracker" element={<FinanceTracker />} />
-            <Route path="/family" element={<FamilyConnect />} />
-          </Routes>
+                  </div>
+                }
+              />
+              <Route path="/inventorytracker" element={<InventoryManager />} />
+              <Route path="/taskmanager" element={<TaskManager />} />
+              <Route path="/financetracker" element={<FinanceTracker />} />
+              <Route path="/family" element={<FamilyConnect />} />
+              <Route path="/profile" element={<ProfileDashboard />} />
+            </Routes>
+          )}
         </div>
       </div>
     </div>

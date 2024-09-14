@@ -2,8 +2,11 @@ import React, { useContext } from "react";
 import { Navbar, Nav, Form, FormControl, Dropdown } from "react-bootstrap";
 import { FaBell, FaUserCircle } from "react-icons/fa";
 import { AuthContext } from "../../../context/AuthContext";
-const Header = () => {
-  const { logout } = useContext(AuthContext);
+import { Link } from "react-router-dom"; // Import Link for routing
+
+const Header = ({ onProfileClick }) => {
+  const { logout } = useContext(AuthContext); // Context for handling logout
+
   return (
     <Navbar
       bg="dark"
@@ -16,34 +19,48 @@ const Header = () => {
         zIndex: 1000,
       }}
     >
-      <Navbar.Brand href="/" className="text-info">
-        <img src=".\favicon-synckin.png" alt="" style={{ width: "40px" }}  />{" "}
+      <Navbar.Brand as={Link} to="/" className="text-info">
+        <img
+          src=".\favicon-synckin.png"
+          alt="Synckin.ai Logo"
+          style={{ width: "40px" }}
+        />{" "}
         Synckin.ai
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
+        {/* Centered Search Bar */}
         <Form className="mx-auto" style={{ width: "40%" }}>
           <FormControl
             type="search"
             placeholder="Search"
-            className="mr-2 bg-dark text-light "
+            className="mr-2 bg-dark text-light"
             style={{ borderRadius: "20px", border: "none" }}
           />
         </Form>
-        <Nav className="ml-auto">
-          <Nav.Link href="#notifications">
+
+        {/* Right-hand Side Icons */}
+        <Nav className="ml-auto d-flex align-items-center">
+          <Nav.Link as={Link} to="/dashboard/notifications">
             <FaBell className="text-light" />
           </Nav.Link>
-          <Dropdown alignLeft className="text-light me-2 ms-2">
+
+          {/* Profile Dropdown */}
+          <Dropdown align="end" className="ms-3">
             <Dropdown.Toggle variant="secondary" id="dropdown-basic">
               <FaUserCircle className="text-light" />
             </Dropdown.Toggle>
 
-            <Dropdown.Menu align="right" className="bg-dark text-light">
-              <Dropdown.Item href="#profile" className="text-light">
+            <Dropdown.Menu align="end" className="bg-dark text-light">
+              <Dropdown.Item
+                as={Link}
+                to="/dashboard/profile"
+                className="text-light"
+                onClick={onProfileClick} // Profile Click Handler
+              >
                 Profile
               </Dropdown.Item>
-              <Dropdown.Item href="#settings" className="text-light">
+              <Dropdown.Item as={Link} to="/settings" className="text-light">
                 Settings
               </Dropdown.Item>
               <Dropdown.Divider />
