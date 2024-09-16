@@ -4,6 +4,7 @@ import AddFamilyMember from "./utils/AddMember";
 import FamilyDetails from "./utils/FamilyDetails";
 import { Fab, Container, Grid, Typography, Box } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import "bootstrap/dist/css/bootstrap.min.css"; // Import Bootstrap
 
 const FamilyPage = () => {
   return (
@@ -17,10 +18,10 @@ const FamilyPage = () => {
         </Fab>
       </Box>
       <Grid container spacing={4}>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={6} className="mb-4">
           <CreateFamily />
         </Grid>
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={6} className="mb-4">
           <AddFamilyMember />
         </Grid>
         <Grid item xs={12}>

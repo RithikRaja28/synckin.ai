@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import {
   Button,
@@ -14,6 +14,7 @@ import {
   Autocomplete,
   CircularProgress,
 } from "@mui/material";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const AddFamilyMember = () => {
   const [username, setUsername] = useState("");
@@ -27,9 +28,8 @@ const AddFamilyMember = () => {
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch user suggestions based on the search query
   const fetchUserSuggestions = async (query) => {
-    if (!query) return; // Skip empty queries
+    if (!query) return;
     setLoading(true);
     try {
       const response = await axios.get(
@@ -56,14 +56,14 @@ const AddFamilyMember = () => {
       );
       setSnackbar({
         open: true,
-        message: "Member added successfully!",
+        message: "Invitation sent successfully! Check your email.",
         type: "success",
       });
       setOpen(false);
     } catch (error) {
       setSnackbar({
         open: true,
-        message: "Error adding member!",
+        message: "Error sending invitation!",
         type: "error",
       });
     }
@@ -73,8 +73,13 @@ const AddFamilyMember = () => {
     setSnackbar({ open: false, message: "", type: "" });
 
   return (
-    <div>
-      <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
+    <div className="text-center">
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => setOpen(true)}
+        className="mb-3"
+      >
         Add Family Member
       </Button>
       <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
@@ -112,6 +117,7 @@ const AddFamilyMember = () => {
             onChange={(e) => setRole(e.target.value)}
             fullWidth
             margin="dense"
+            className="mt-3"
           >
             <MenuItem value="Parent">Parent</MenuItem>
             <MenuItem value="Children">Children</MenuItem>
