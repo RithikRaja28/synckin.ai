@@ -68,23 +68,26 @@ router.get("/search", async (req, res) => {
   const { query } = req.query;
 
   try {
-    // Ensure a search query is provided
     if (!query) {
       return res.status(400).json({ msg: "Search query is required" });
     }
 
-    // Find users matching the search query
+    // Add debugging logs
+    console.log("Search query:", query);
+
     const users = await User.find({
-      username: { $regex: query, $options: "i" },
-      familyId: { $exists: false },
+      username: { $regex: query, $options: "i" }, // Case-insensitive search
+      // Adjust based on your schema
     }).limit(10);
 
+    console.log("Users found:", users); // Check if users are found
     res.json(users);
   } catch (err) {
     console.error("Error searching users:", err.message);
     res.status(500).send("Server Error");
   }
 });
+
 
 router.post("/create", async (req, res) => {
   const userId = verifyToken(req);
@@ -169,10 +172,89 @@ router.post("/add-member", async (req, res) => {
       to: member.email,
       subject: "Family Invitation",
       html: `
-        <p>You have been invited to join a family on our platform. Click the link below to accept the invitation:</p>
-        <a href="http://localhost:5000/api/family/accept-invitation?token=${inviteToken}">Accept Invitation</a>
-      `,
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f7f9fc;
+        }
+        .container {
+          width: 100%;
+          max-width: 600px;
+          margin: 20px auto;
+          background: #ffffff;
+          padding: 40px;
+          border-radius: 12px;
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+        .header {
+          background: #0056b3;
+          color: #ffffff;
+          padding: 20px;
+          border-radius: 12px 12px 0 0;
+          font-size: 28px;
+          font-weight: 600;
+        }
+        .content {
+          margin: 20px 0;
+          font-size: 16px;
+          line-height: 1.6;
+          color: #333333;
+        }
+        .button {
+          display: inline-block;
+          padding: 15px 30px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #ffffff;
+          background-color: #007bff;
+          text-decoration: none;
+          border-radius: 30px;
+          text-transform: uppercase;
+          margin: 20px 0;
+          transition: background-color 0.3s ease;
+        }
+        .button:hover {
+          background-color: #0056b3;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 14px;
+          color: #999999;
+        }
+        .btn-text {
+          font-weight: 600;
+          text-decoration: none;
+          color: #ffffff;
+          transition: color 0.3s ease;
+        }
+        
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">You're Invited!</div>
+        <div class="content">
+          <p>Hello,</p>
+          <p>You've been invited to join a family on our platform. Click the button below to accept the invitation and get started:</p>
+          <a href="http://localhost:5000/api/family/accept-invitation?token=${inviteToken}" class="button"><span class="btn-text">Accept Invitation</span></a>
+          <p>If you have any questions, please contact us at support@yourplatform.com.</p>
+          <p>Best regards,<br>SyncKin</p>
+        </div>
+        <div class="footer">
+          <p>This is an automated message, please do not reply directly to this email.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
     };
+
+
 
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {

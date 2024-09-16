@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import {
   Button,
@@ -27,6 +27,18 @@ const AddFamilyMember = () => {
   });
   const [options, setOptions] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  // Debouncing: Avoid frequent API calls
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      if (searchQuery) {
+        fetchUserSuggestions(searchQuery);
+      }
+    }, 300); // 300ms delay
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchQuery]);
 
   const fetchUserSuggestions = async (query) => {
     if (!query) return;
@@ -41,7 +53,10 @@ const AddFamilyMember = () => {
       );
       setOptions(response.data);
     } catch (error) {
-      console.error("Error fetching user suggestions:", error);
+      console.error(
+        "Error fetching user suggestions:",
+        error.response ? error.response.data : error.message
+      );
     }
     setLoading(false);
   };
@@ -49,11 +64,18 @@ const AddFamilyMember = () => {
   const addFamilyMember = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.post(
+      console.log(
+        "Sending invitation with username:",
+        username,
+        "and role:",
+        role
+      );
+      const response = await axios.post(
         "http://localhost:5000/api/family/add-member",
         { username, role },
         { headers: { "x-auth-token": token } }
       );
+      console.log("Invitation response:", response.data);
       setSnackbar({
         open: true,
         message: "Invitation sent successfully! Check your email.",
@@ -61,6 +83,10 @@ const AddFamilyMember = () => {
       });
       setOpen(false);
     } catch (error) {
+      console.error(
+        "Error sending invitation:",
+        error.response ? error.response.data : error.message
+      );
       setSnackbar({
         open: true,
         message: "Error sending invitation!",
@@ -89,8 +115,14 @@ const AddFamilyMember = () => {
             freeSolo
             options={options.map((option) => option.username)}
             loading={loading}
-            onInputChange={(e, value) => fetchUserSuggestions(value)}
-            onChange={(e, value) => setUsername(value)}
+            onInputChange={(e, value) => {
+              setSearchQuery(value);
+            }}
+            onChange={(e, value) => {
+              if (value) {
+                setUsername(value);
+              }
+            }}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -109,9 +141,15 @@ const AddFamilyMember = () => {
                     </>
                   ),
                 }}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setUsername(value);
+                  console.log("Username:", value);
+                }}
               />
             )}
           />
+
           <Select
             value={role}
             onChange={(e) => setRole(e.target.value)}
