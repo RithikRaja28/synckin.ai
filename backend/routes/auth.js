@@ -129,5 +129,43 @@
       }
     });
 
+    // Update user profile
+router.put("/profile", authmiddleware, async (req, res) => {
+  const { username, email, role } = req.body;
+
+  // Validation
+  if (!username || !email || !role) {
+    return res.status(400).json({ msg: "All fields are required" });
+  }
+
+  try {
+    let user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Check if the email is being updated and if it's already taken by another user
+    if (email !== user.email) {
+      const emailExists = await User.findOne({ email });
+      if (emailExists) {
+        return res.status(400).json({ msg: "Email already in use" });
+      }
+    }
+
+    // Update fields
+    user.username = username || user.username;
+    user.email = email || user.email;
+    user.role = role || user.role;
+
+    await user.save();
+
+    res.json({ msg: "Profile updated successfully", user });
+  } catch (err) {
+    console.error("Error updating profile:", err.message);
+    res.status(500).send("Server error");
+  }
+});
+
 
     module.exports = router;

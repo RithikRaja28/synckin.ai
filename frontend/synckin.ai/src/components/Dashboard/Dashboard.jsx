@@ -15,6 +15,7 @@ import FamilyConnect from "../Family Connect/FamilyConnect";
 import { Grid, Paper } from "@mui/material"; // Import Grid for layout
 import DashboardCard from "./utils/DashboardCard";
 import ProfileDashboard from "../Profile/ProfileDashboard";
+import SettingsPage from "../Setting Page/SettingsPage";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -149,6 +150,10 @@ const Dashboard = () => {
               <Route path="/financetracker" element={<FinanceTracker />} />
               <Route path="/family" element={<FamilyConnect />} />
               <Route path="/profile" element={<ProfileDashboard />} />
+              <Route
+                path="/settings"
+                element={<SettingsPage />}
+              />
             </Routes>
           )}
         </div>
