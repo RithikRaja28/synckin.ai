@@ -3,7 +3,6 @@ import axios from "axios";
 import {
   TextField,
   Button,
-  MenuItem,
   CircularProgress,
   Switch,
   List,
@@ -11,6 +10,7 @@ import {
   ListItemIcon,
   ListItemText,
   Box,
+  MenuItem
 } from "@mui/material";
 import { Container, Row, Col } from "react-bootstrap";
 import PersonIcon from "@mui/icons-material/Person";
@@ -27,10 +27,13 @@ const SettingsPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [activeTab, setActiveTab] = useState("profile"); // Default to profile tab
+  const [activeTab, setActiveTab] = useState("profile");
+  const [passwords, setPasswords] = useState({
+    currentPassword: "",
+    newPassword: "",
+  });
 
   useEffect(() => {
-    // Fetch current profile
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -56,7 +59,7 @@ const SettingsPage = () => {
   }, []);
 
   const handleTabClick = (tab) => {
-    setActiveTab(tab); // Set the active tab when clicked
+    setActiveTab(tab);
   };
 
   const handleProfileChange = (e) => {
@@ -90,10 +93,40 @@ const SettingsPage = () => {
     }
   };
 
+  const handlePasswordChange = (e) => {
+    setPasswords({ ...passwords, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmitPasswordChange = async (e) => {
+    e.preventDefault();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) throw new Error("No token found");
+
+      const config = {
+        headers: {
+          "x-auth-token": token,
+        },
+      };
+      setLoading(true);
+      setError("");
+      setSuccess("");
+      await axios.put(
+        "http://localhost:5000/auth/change-password",
+        passwords,
+        config
+      );
+      setSuccess("Password updated successfully!");
+    } catch (err) {
+      setError("Error updating password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Container fluid className="mt-5">
       <Row>
-        {/* Left-side Navigation */}
         <Col md={3} className="border-end">
           <List component="nav">
             <ListItem
@@ -126,14 +159,11 @@ const SettingsPage = () => {
               </ListItemIcon>
               <ListItemText primary="Security" />
             </ListItem>
-            {/* Add more tabs here */}
           </List>
         </Col>
 
-        {/* Right-side Content */}
         <Col md={9}>
           <Box p={3}>
-            {/* Profile Section */}
             {activeTab === "profile" && (
               <>
                 <h2>Profile Settings</h2>
@@ -193,7 +223,6 @@ const SettingsPage = () => {
               </>
             )}
 
-            {/* Theme Section */}
             {activeTab === "theme" && (
               <>
                 <h2>Theme Settings</h2>
@@ -209,6 +238,55 @@ const SettingsPage = () => {
                     color="primary"
                   />
                 </Box>
+              </>
+            )}
+
+            {/* Security Section */}
+            {activeTab === "security" && (
+              <>
+                <h2>Security Settings</h2>
+                {loading ? (
+                  <CircularProgress />
+                ) : (
+                  <form onSubmit={handleSubmitPasswordChange}>
+                    <TextField
+                      fullWidth
+                      label="Current Password"
+                      name="currentPassword"
+                      type="password"
+                      value={passwords.currentPassword}
+                      onChange={handlePasswordChange}
+                      margin="normal"
+                      variant="outlined"
+                    />
+                    <TextField
+                      fullWidth
+                      label="New Password"
+                      name="newPassword"
+                      type="password"
+                      value={passwords.newPassword}
+                      onChange={handlePasswordChange}
+                      margin="normal"
+                      variant="outlined"
+                    />
+                    {error && <div className="text-danger mt-3">{error}</div>}
+                    {success && (
+                      <div className="text-success mt-3">{success}</div>
+                    )}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      type="submit"
+                      fullWidth
+                    >
+                      {loading ? (
+                        <CircularProgress size={24} />
+                      ) : (
+                        "Update Password"
+                      )}
+                    </Button>
+                  </form>
+                )}
               </>
             )}
           </Box>
