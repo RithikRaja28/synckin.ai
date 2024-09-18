@@ -15,26 +15,37 @@ import {
   DialogContent,
   DialogContentText,
   DialogActions,
+  TextField,
+  IconButton,
   Snackbar,
   Alert as MuiAlert,
+  Tooltip,
 } from "@mui/material";
 import GroupIcon from "@mui/icons-material/Group";
-import DeleteIcon from "@mui/icons-material/Delete";
-import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 
 const FamilyDetails = () => {
   const [family, setFamily] = useState(null);
   const [error, setError] = useState("");
-  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
-  const [openRemoveMemberDialog, setOpenRemoveMemberDialog] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
     message: "",
     type: "",
   });
+  const [selectedMember, setSelectedMember] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [savingsList, setSavingsList] = useState([]);
+  const [openTaskDialog, setOpenTaskDialog] = useState(false);
+  const [openSavingsDialog, setOpenSavingsDialog] = useState(false);
+  const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
+  const [task, setTask] = useState({ title: "", description: "", dueDate: "" });
+  const [savings, setSavings] = useState({
+    goal: "",
+    amount: "",
+    targetDate: "",
+  });
 
-  // Fetch family details
   const fetchFamily = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -51,71 +62,132 @@ const FamilyDetails = () => {
     }
   };
 
-  // Handle delete family
-  const handleDeleteFamily = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      await axios.delete("http://localhost:5000/api/family/delete", {
-        headers: { "x-auth-token": token },
-      });
-      setSnackbar({
-        open: true,
-        message: "Family deleted successfully",
-        type: "success",
-      });
-      setFamily(null);
-       // Clear family from state after deletion
-    } catch (err) {
-      setSnackbar({
-        open: true,
-        message: "Error deleting family",
-        type: "error",
-      });
-    }
-    setOpenDeleteDialog(false);
-  };
-
-  // Handle remove member
-  const handleRemoveMember = async () => {
-    const token = localStorage.getItem("token");
-    try {
-      await axios.delete("http://localhost:5000/api/family/remove-member", {
-        headers: { "x-auth-token": token },
-        data: { _id: selectedMember }, // Send _id in the request body
-      });
-      setSnackbar({
-        open: true,
-        message: "Member removed successfully",
-        type: "success",
-      });
-      fetchFamily(); // Refresh family details
-    } catch (err) {
-      setSnackbar({
-        open: true,
-        message: "Error removing member",
-        type: "error",
-      });
-    }
-    setOpenRemoveMemberDialog(false);
-  };
-
-
-
   useEffect(() => {
     fetchFamily();
   }, []);
 
-  // Handle opening and closing dialogs
-  const handleOpenDeleteDialog = () => setOpenDeleteDialog(true);
-  const handleCloseDeleteDialog = () => setOpenDeleteDialog(false);
-  const handleOpenRemoveMemberDialog = (memberId) => {
-    setSelectedMember(memberId);
-    setOpenRemoveMemberDialog(true);
-  };
-  const handleCloseRemoveMemberDialog = () => setOpenRemoveMemberDialog(false);
+  useEffect(() => {
+    const fetchMemberDetails = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const tasksResponse = await axios.get(
+          `http://localhost:5000/api/family-member-task/tasks/${selectedMember}`,
+          { headers: { "x-auth-token": token } }
+        );
+        console.log("Tasks API response:", tasksResponse.data);
 
-  // Handle closing the snackbar
-  const handleCloseSnackbar = () => setSnackbar({ ...snackbar, open: false });
+        const savingsResponse = await axios.get(
+          `http://localhost:5000/api/family-member-savings/savings/${selectedMember}`,
+          { headers: { "x-auth-token": token } }
+        );
+        console.log("Savings API response:", savingsResponse.data);
+
+        setTasks(tasksResponse.data);
+        setSavingsList(savingsResponse.data);
+      } catch (error) {
+        console.error("Error fetching member details:", error);
+      }
+    };
+
+    if (selectedMember) {
+      fetchMemberDetails();
+    }
+  }, [selectedMember]);
+
+
+
+  const handleTaskDialogOpen = (memberId) => {
+    setSelectedMember(memberId);
+    setOpenTaskDialog(true);
+  };
+
+  const handleSavingsDialogOpen = (memberId) => {
+    setSelectedMember(memberId);
+    setOpenSavingsDialog(true);
+  };
+
+  const handleTaskDialogClose = () => setOpenTaskDialog(false);
+  const handleSavingsDialogClose = () => setOpenSavingsDialog(false);
+
+  const handleAddTask = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        "http://localhost:5000/api/family-member-task/tasks",
+        { ...task, assignedTo: selectedMember, familyId: family._id },
+        { headers: { "x-auth-token": token } }
+      );
+      setSnackbar({
+        open: true,
+        message: "Task added successfully",
+        type: "success",
+      });
+      setTask({ title: "", description: "", dueDate: "" });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Error adding task",
+        type: "error",
+      });
+    }
+    setOpenTaskDialog(false);
+  };
+
+  const handleAddSavings = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.post(
+        "http://localhost:5000/api/family-member-savings/savings",
+        { ...savings, assignedTo: selectedMember, familyId: family._id },
+        { headers: { "x-auth-token": token } }
+      );
+      setSnackbar({
+        open: true,
+        message: "Savings added successfully",
+        type: "success",
+      });
+      setSavings({ goal: "", amount: "", targetDate: "" });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Error adding savings",
+        type: "error",
+      });
+    }
+    setOpenSavingsDialog(false);
+  };
+
+  const handleViewDetails = async (memberId) => {
+    try {
+      // Fetch tasks and savings for the selected member
+      const token = localStorage.getItem("token");
+      const tasksResponse = await axios.get(
+        `http://localhost:5000/api/family-member-task/tasks/${memberId}`,
+        {
+          headers: { "x-auth-token": token },
+        }
+      );
+      const savingsResponse = await axios.get(
+        `http://localhost:5000/api/family-member-savings/savings/${memberId}`,
+        {
+          headers: { "x-auth-token": token },
+        }
+      );
+      setTasks(tasksResponse.data);
+      setSavingsList(savingsResponse.data);
+      setSelectedMember(memberId);
+      setOpenDetailsDialog(true); // Open the details modal
+    } catch (error) {
+      console.error("Error fetching member details", error);
+      setSnackbar({
+        open: true,
+        message: "Error fetching member details",
+        type: "error",
+      });
+    }
+  };
+
+  const handleDetailsDialogClose = () => setOpenDetailsDialog(false);
 
   if (error) {
     return <div>{error}</div>;
@@ -143,93 +215,174 @@ const FamilyDetails = () => {
                   primary={`${member.userId.username}`}
                   secondary={`Role: ${member.role}`}
                 />
-                {member.role !== "Parent" && (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    startIcon={<PersonRemoveIcon />}
-                    onClick={() =>
-                      handleOpenRemoveMemberDialog(member.userId._id)
-                    }
-                    sx={{ marginLeft: 2 }}
+                <Tooltip title="Add Task">
+                  <IconButton
+                    color="primary"
+                    onClick={() => handleTaskDialogOpen(member.userId._id)}
                   >
-                    Remove
-                  </Button>
-                )}
+                    <AddCircleOutlineIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Add Savings">
+                  <IconButton
+                    color="secondary"
+                    onClick={() => handleSavingsDialogOpen(member.userId._id)}
+                  >
+                    <AddCircleOutlineIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="View Details">
+                  <IconButton
+                    color="info"
+                    onClick={() => handleViewDetails(member.userId._id)}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                </Tooltip>
               </ListItem>
             ))}
           </List>
-
-          {/* Delete Family Button (Visible to Parent only) */}
-          <Button
-            variant="contained"
-            color="error"
-            startIcon={<DeleteIcon />}
-            onClick={handleOpenDeleteDialog}
-            sx={{ marginTop: 2 }}
-          >
-            Delete Family
-          </Button>
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={openDeleteDialog} onClose={handleCloseDeleteDialog}>
-        <DialogTitle>Delete Family</DialogTitle>
+      {/* Task Dialog */}
+      <Dialog open={openTaskDialog} onClose={handleTaskDialogClose}>
+        <DialogTitle>Add Task</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this family? This action cannot be
-            undone.
-          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Task Title"
+            fullWidth
+            value={task.title}
+            onChange={(e) => setTask({ ...task, title: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            fullWidth
+            value={task.description}
+            onChange={(e) => setTask({ ...task, description: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Due Date"
+            type="date"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            value={task.dueDate}
+            onChange={(e) => setTask({ ...task, dueDate: e.target.value })}
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDeleteDialog} color="primary">
+          <Button onClick={handleTaskDialogClose} color="primary">
             Cancel
           </Button>
-          <Button
-            onClick={handleDeleteFamily}
-            color="error"
-            variant="contained"
-          >
-            Delete
+          <Button onClick={handleAddTask} color="primary" variant="contained">
+            Add Task
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Remove Member Confirmation Dialog */}
-      <Dialog
-        open={openRemoveMemberDialog}
-        onClose={handleCloseRemoveMemberDialog}
-      >
-        <DialogTitle>Remove Member</DialogTitle>
+      {/* Savings Dialog */}
+      <Dialog open={openSavingsDialog} onClose={handleSavingsDialogClose}>
+        <DialogTitle>Add Savings</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to remove this member from the family? This
-            action cannot be undone.
-          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Savings Goal"
+            fullWidth
+            value={savings.goal}
+            onChange={(e) => setSavings({ ...savings, goal: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Amount"
+            fullWidth
+            value={savings.amount}
+            onChange={(e) => setSavings({ ...savings, amount: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Target Date"
+            type="date"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            value={savings.targetDate}
+            onChange={(e) =>
+              setSavings({ ...savings, targetDate: e.target.value })
+            }
+          />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseRemoveMemberDialog} color="primary">
+          <Button onClick={handleSavingsDialogClose} color="primary">
             Cancel
           </Button>
           <Button
-            onClick={handleRemoveMember}
-            color="error"
+            onClick={handleAddSavings}
+            color="primary"
             variant="contained"
           >
-            Remove
+            Add Savings
           </Button>
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar Notification */}
+      {/* Details Dialog */}
+      <Dialog open={openDetailsDialog} onClose={handleDetailsDialogClose}>
+        <DialogTitle>Member Details</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Tasks</DialogContentText>
+          {tasks.length > 0 ? (
+            <List>
+              {tasks.map((task) => (
+                <ListItem key={task._id}>
+                  <ListItemText
+                    primary={task.title}
+                    secondary={`Due: ${new Date(
+                      task.dueDate
+                    ).toLocaleDateString()}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography>No tasks assigned.</Typography>
+          )}
+          <DialogContentText>Savings</DialogContentText>
+          {savingsList.length > 0 ? (
+            <List>
+              {savingsList.map((saving) => (
+                <ListItem key={saving._id}>
+                  <ListItemText
+                    primary={saving.goal}
+                    secondary={`Amount: ${saving.amount}, Target: ${new Date(
+                      saving.targetDate
+                    ).toLocaleDateString()}`}
+                  />
+                </ListItem>
+              ))}
+            </List>
+          ) : (
+            <Typography>No savings set.</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDetailsDialogClose} color="primary">
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Snackbar for feedback */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
         <MuiAlert
-          onClose={handleCloseSnackbar}
+          onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.type}
           sx={{ width: "100%" }}
         >

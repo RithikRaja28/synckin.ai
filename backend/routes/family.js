@@ -23,8 +23,9 @@ const verifyToken = (req) => {
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "rohitvijayandrive@gmail.com",
-    pass: "kfzxznsmouxvszel",
+    user: "rithikraja28.rr@gmail.com",
+    pass: "hrzxsykhcmeaaoyb"
+
   },
 });
 
@@ -168,10 +169,11 @@ router.post("/add-member", async (req, res) => {
     );
 
     const mailOptions = {
-      from: "rohitvijayandrive@gmail.com",
+      from:{name:"noreply", address:"rithikraja28.rr@gmail.com"} ,
       to: member.email,
       subject: "Family Invitation",
-      html: `
+      html: 
+      `
     <html>
     <head>
       <style>
