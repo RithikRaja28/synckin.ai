@@ -24,6 +24,8 @@ import {
 import GroupIcon from "@mui/icons-material/Group";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteIcon from "@mui/icons-material/Delete";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 
 const FamilyDetails = () => {
   const [family, setFamily] = useState(null);
@@ -74,14 +76,10 @@ const FamilyDetails = () => {
           `http://localhost:5000/api/family-member-task/tasks/${selectedMember}`,
           { headers: { "x-auth-token": token } }
         );
-        console.log("Tasks API response:", tasksResponse.data);
-
         const savingsResponse = await axios.get(
           `http://localhost:5000/api/family-member-savings/savings/${selectedMember}`,
           { headers: { "x-auth-token": token } }
         );
-        console.log("Savings API response:", savingsResponse.data);
-
         setTasks(tasksResponse.data);
         setSavingsList(savingsResponse.data);
       } catch (error) {
@@ -93,8 +91,6 @@ const FamilyDetails = () => {
       fetchMemberDetails();
     }
   }, [selectedMember]);
-
-
 
   const handleTaskDialogOpen = (memberId) => {
     setSelectedMember(memberId);
@@ -159,7 +155,6 @@ const FamilyDetails = () => {
 
   const handleViewDetails = async (memberId) => {
     try {
-      // Fetch tasks and savings for the selected member
       const token = localStorage.getItem("token");
       const tasksResponse = await axios.get(
         `http://localhost:5000/api/family-member-task/tasks/${memberId}`,
@@ -176,7 +171,7 @@ const FamilyDetails = () => {
       setTasks(tasksResponse.data);
       setSavingsList(savingsResponse.data);
       setSelectedMember(memberId);
-      setOpenDetailsDialog(true); // Open the details modal
+      setOpenDetailsDialog(true);
     } catch (error) {
       console.error("Error fetching member details", error);
       setSnackbar({
@@ -188,6 +183,52 @@ const FamilyDetails = () => {
   };
 
   const handleDetailsDialogClose = () => setOpenDetailsDialog(false);
+
+  const handleDeleteFamily = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete("http://localhost:5000/api/family/delete", {
+        headers: { "x-auth-token": token },
+      });
+      setSnackbar({
+        open: true,
+        message: "Family deleted successfully",
+        type: "success",
+      });
+      setFamily(null); // Reset the family data after deletion
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Error deleting family",
+        type: "error",
+      });
+    }
+  };
+
+  const handleRemoveMember = async (memberId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete("http://localhost:5000/api/family/remove-member", {
+        headers: { "x-auth-token": token },
+        data: { _id: memberId },
+      });
+      setSnackbar({
+        open: true,
+        message: "Member removed successfully",
+        type: "success",
+      });
+      setFamily((prev) => ({
+        ...prev,
+        members: prev.members.filter((m) => m.userId._id !== memberId),
+      }));
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Error removing member",
+        type: "error",
+      });
+    }
+  };
 
   if (error) {
     return <div>{error}</div>;
@@ -201,8 +242,31 @@ const FamilyDetails = () => {
     <div>
       <Card sx={{ marginTop: 2 }}>
         <CardContent>
-          <Typography variant="h5">Family: {family.familyName}</Typography>
-          <Typography variant="h6">Members:</Typography>
+          <Typography className="d-inline" variant="h5">
+            Family: {family.familyName}
+          </Typography>
+          <span>
+            <Tooltip title="Delete Family">
+              <IconButton
+                color="error"
+                variant="contained"
+                onClick={handleDeleteFamily}
+                className="mb-2 ms-4"
+              >
+                <DeleteIcon />
+              </IconButton>
+            </Tooltip>
+            {/* <Button
+              variant="contained"
+              color="secondary"
+              className="rounded-pill ms-4 mb-1"
+              startIcon={<DeleteIcon />}
+              onClick={handleDeleteFamily}
+            ></Button> */}
+          </span>
+          <Typography variant="h6" sx={{ marginTop: 2 }}>
+            Members:
+          </Typography>
           <List>
             {family.members.map((member) => (
               <ListItem key={member.userId._id}>
@@ -239,6 +303,14 @@ const FamilyDetails = () => {
                     <VisibilityIcon />
                   </IconButton>
                 </Tooltip>
+                <Tooltip title="Remove Member">
+                  <IconButton
+                    color="error"
+                    onClick={() => handleRemoveMember(member.userId._id)}
+                  >
+                    <PersonRemoveIcon />
+                  </IconButton>
+                </Tooltip>
               </ListItem>
             ))}
           </List>
@@ -250,35 +322,34 @@ const FamilyDetails = () => {
         <DialogTitle>Add Task</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
-            margin="dense"
             label="Task Title"
             fullWidth
+            margin="normal"
             value={task.title}
             onChange={(e) => setTask({ ...task, title: e.target.value })}
           />
           <TextField
-            margin="dense"
             label="Description"
             fullWidth
+            margin="normal"
+            multiline
+            rows={3}
             value={task.description}
             onChange={(e) => setTask({ ...task, description: e.target.value })}
           />
           <TextField
-            margin="dense"
             label="Due Date"
             type="date"
             fullWidth
-            InputLabelProps={{ shrink: true }}
+            margin="normal"
             value={task.dueDate}
             onChange={(e) => setTask({ ...task, dueDate: e.target.value })}
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleTaskDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddTask} color="primary" variant="contained">
+          <Button onClick={handleTaskDialogClose}>Cancel</Button>
+          <Button onClick={handleAddTask} color="primary">
             Add Task
           </Button>
         </DialogActions>
@@ -289,41 +360,34 @@ const FamilyDetails = () => {
         <DialogTitle>Add Savings</DialogTitle>
         <DialogContent>
           <TextField
-            autoFocus
-            margin="dense"
             label="Savings Goal"
             fullWidth
+            margin="normal"
             value={savings.goal}
             onChange={(e) => setSavings({ ...savings, goal: e.target.value })}
           />
           <TextField
-            margin="dense"
             label="Amount"
             fullWidth
+            margin="normal"
             value={savings.amount}
             onChange={(e) => setSavings({ ...savings, amount: e.target.value })}
           />
           <TextField
-            margin="dense"
             label="Target Date"
             type="date"
             fullWidth
-            InputLabelProps={{ shrink: true }}
+            margin="normal"
             value={savings.targetDate}
             onChange={(e) =>
               setSavings({ ...savings, targetDate: e.target.value })
             }
+            InputLabelProps={{ shrink: true }}
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleSavingsDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button
-            onClick={handleAddSavings}
-            color="primary"
-            variant="contained"
-          >
+          <Button onClick={handleSavingsDialogClose}>Cancel</Button>
+          <Button onClick={handleAddSavings} color="primary">
             Add Savings
           </Button>
         </DialogActions>
@@ -331,60 +395,46 @@ const FamilyDetails = () => {
 
       {/* Details Dialog */}
       <Dialog open={openDetailsDialog} onClose={handleDetailsDialogClose}>
-        <DialogTitle>Member Details</DialogTitle>
+        <DialogTitle>Details</DialogTitle>
         <DialogContent>
-          <DialogContentText>Tasks</DialogContentText>
-          {tasks.length > 0 ? (
-            <List>
-              {tasks.map((task) => (
-                <ListItem key={task._id}>
-                  <ListItemText
-                    primary={task.title}
-                    secondary={`Due: ${new Date(
-                      task.dueDate
-                    ).toLocaleDateString()}`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography>No tasks assigned.</Typography>
-          )}
-          <DialogContentText>Savings</DialogContentText>
-          {savingsList.length > 0 ? (
-            <List>
-              {savingsList.map((saving) => (
-                <ListItem key={saving._id}>
-                  <ListItemText
-                    primary={saving.goal}
-                    secondary={`Amount: ${saving.amount}, Target: ${new Date(
-                      saving.targetDate
-                    ).toLocaleDateString()}`}
-                  />
-                </ListItem>
-              ))}
-            </List>
-          ) : (
-            <Typography>No savings set.</Typography>
-          )}
+          <Typography variant="h6">Tasks:</Typography>
+          <List>
+            {tasks.map((task) => (
+              <ListItem key={task._id}>
+                <ListItemText primary={task.title} secondary={task.dueDate} />
+              </ListItem>
+            ))}
+          </List>
+          <Typography variant="h6" sx={{ marginTop: 2 }}>
+            Savings:
+          </Typography>
+          <List>
+            {savingsList.map((saving) => (
+              <ListItem key={saving._id}>
+                <ListItemText
+                  primary={saving.goal}
+                  secondary={saving.targetDate}
+                />
+              </ListItem>
+            ))}
+          </List>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDetailsDialogClose} color="primary">
-            Close
-          </Button>
+          <Button onClick={handleDetailsDialogClose}>Close</Button>
         </DialogActions>
       </Dialog>
 
-      {/* Snackbar for feedback */}
+      {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={6000}
+        autoHideDuration={4000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
         <MuiAlert
+          elevation={6}
+          variant="filled"
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.type}
-          sx={{ width: "100%" }}
         >
           {snackbar.message}
         </MuiAlert>
