@@ -9,6 +9,7 @@ import {
 import IncomePage from "./IncomePage";
 import DebtTracker from "./DebtTracker";
 import SavingsTracker from "./SavingTracker";
+import ExpensePage from "./ExpenseTracker";
 
 const FinanceTracker = () => {
   const [activeSection, setActiveSection] = useState("income");
@@ -18,7 +19,7 @@ const FinanceTracker = () => {
       case "income":
         return <IncomePage />;
       case "expense":
-        return <IncomePage />; // Replace with ExpensePage component
+        return <ExpensePage />; // Replace with ExpensePage component
       case "savings":
         return <SavingsTracker />; // Replace with SavingsPage component
       case "debt":

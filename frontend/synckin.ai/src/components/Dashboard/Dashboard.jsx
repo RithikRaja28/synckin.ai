@@ -16,6 +16,7 @@ import { Grid, Paper } from "@mui/material"; // Import Grid for layout
 import DashboardCard from "./utils/DashboardCard";
 import ProfileDashboard from "../Profile/ProfileDashboard";
 import SettingsPage from "../Setting Page/SettingsPage";
+import ExpenseChart from "../Finance Tracker/utils/ExpenseChart";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -23,6 +24,7 @@ const Dashboard = () => {
   const [incomes, setIncomes] = useState([]);
   const [debts, setDebts] = useState([]); // State for debts
   const [savings, setSavings] = useState([]);
+  const [expense, setExpense]= useState([]);
   const [showProfile, setShowProfile] = useState(false); // Track profile page
 
   useEffect(() => {
@@ -76,6 +78,21 @@ const Dashboard = () => {
         console.error("There was an error fetching the savings!", error)
       );
   }, []);
+
+   useEffect(() => {
+     // Fetch income data for the chart
+     axios
+       .get("http://localhost:5000/api/expense/show", {
+         headers: { "x-auth-token": localStorage.getItem("token") },
+       })
+       .then((response) => {
+         const expenseData = Array.isArray(response.data) ? response.data : [];
+         setExpense(expenseData);
+       })
+       .catch((error) =>
+         console.error("There was an error fetching the incomes!", error)
+       );
+   }, []);
 
   // Handler to switch between main dashboard and profile
   const handleProfileClick = () => {
@@ -141,6 +158,15 @@ const Dashboard = () => {
                           <SavingsChart savings={savings} />
                         </Paper>
                       </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <ExpenseChart expenses={expense} />
+                        </Paper>
+                      </Grid>
                     </Grid>
                   </div>
                 }
@@ -150,10 +176,7 @@ const Dashboard = () => {
               <Route path="/financetracker" element={<FinanceTracker />} />
               <Route path="/family" element={<FamilyConnect />} />
               <Route path="/profile" element={<ProfileDashboard />} />
-              <Route
-                path="/settings"
-                element={<SettingsPage />}
-              />
+              <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           )}
         </div>
