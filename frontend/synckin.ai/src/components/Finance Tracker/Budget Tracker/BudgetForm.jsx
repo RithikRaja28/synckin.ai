@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
 import { addBudget, updateBudget } from "./api";
 
 const BudgetForm = ({ show, handleClose, existingBudget, refreshBudgets }) => {
@@ -29,69 +40,73 @@ const BudgetForm = ({ show, handleClose, existingBudget, refreshBudgets }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>{existingBudget ? "Edit" : "Add"} Budget</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="name">
-            <Form.Label>Budget Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={budget.name}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="amount">
-            <Form.Label>Amount</Form.Label>
-            <Form.Control
-              type="number"
-              name="amount"
-              value={budget.amount}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="duration">
-            <Form.Label>Duration</Form.Label>
-            <Form.Select
+    <Dialog open={show} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{existingBudget ? "Edit" : "Add"} Budget</DialogTitle>
+      <DialogContent>
+        <form onSubmit={handleSubmit}>
+          <TextField
+            label="Budget Name"
+            name="name"
+            value={budget.name}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+            required
+          />
+          <TextField
+            label="Amount"
+            type="number"
+            name="amount"
+            value={budget.amount}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+            required
+          />
+          <FormControl fullWidth margin="dense">
+            <InputLabel>Duration</InputLabel>
+            <Select
               name="duration"
               value={budget.duration}
               onChange={handleChange}
             >
-              <option value="monthly">Monthly</option>
-              <option value="annually">Annually</option>
-            </Form.Select>
-          </Form.Group>
-          <Form.Group controlId="startDate">
-            <Form.Label>Start Date</Form.Label>
-            <Form.Control
-              type="date"
-              name="startDate"
-              value={budget.startDate}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Form.Group controlId="endDate">
-            <Form.Label>End Date</Form.Label>
-            <Form.Control
-              type="date"
-              name="endDate"
-              value={budget.endDate}
-              onChange={handleChange}
-              required
-            />
-          </Form.Group>
-          <Button variant="primary" type="submit">
-            Save Budget
-          </Button>
-        </Form>
-      </Modal.Body>
-    </Modal>
+              <MenuItem value="monthly">Monthly</MenuItem>
+              <MenuItem value="annually">Annually</MenuItem>
+            </Select>
+          </FormControl>
+          <TextField
+            label="Start Date"
+            type="date"
+            name="startDate"
+            value={budget.startDate}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+          <TextField
+            label="End Date"
+            type="date"
+            name="endDate"
+            value={budget.endDate}
+            onChange={handleChange}
+            fullWidth
+            margin="dense"
+            InputLabelProps={{ shrink: true }}
+            required
+          />
+          <DialogActions>
+            <Button onClick={handleClose} color="secondary">
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" color="primary">
+              Save Budget
+            </Button>
+          </DialogActions>
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 

@@ -1,8 +1,21 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Alert } from "react-bootstrap";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Alert,
+  Box,
+} from "@mui/material";
 import BudgetForm from "./BudgetForm";
 import ProgressBar from "./ProgressBar";
+import BudgetChart from "./BudgetChart";
 import { getBudgets, deleteBudget, getBudgetProgress } from "./api";
+import { Typography } from "@mui/material";
 
 const BudgetList = () => {
   const [budgets, setBudgets] = useState([]);
@@ -39,49 +52,68 @@ const BudgetList = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h2>Budgets</h2>
-      <Button onClick={() => setShowForm(true)}>Add Budget</Button>
-      <Table striped bordered hover className="mt-3">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Amount</th>
-            <th>Duration</th>
-            <th>Progress</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {budgets.map((budget) => (
-            <tr key={budget._id}>
-              <td>{budget.name}</td>
-              <td>₹{budget.amount}</td>
-              <td>{budget.duration}</td>
-              <td>
-                <ProgressBar
-                  budget={budget}
-                  onProgressCheck={handleProgressCheck}
-                />
-              </td>
-              <td>
-                <Button variant="warning" onClick={() => handleEdit(budget)}>
-                  Edit
-                </Button>{" "}
-                <Button
-                  variant="danger"
-                  onClick={() => handleDelete(budget._id)}
-                >
-                  Delete
-                </Button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
-
-      {alert && <Alert variant="danger">{alert}</Alert>}
-
+    <Box sx={{ padding: 3 }}>
+      <Typography variant="h4" gutterBottom>
+        Budgets
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => setShowForm(true)}
+      >
+        Add Budget
+      </Button>
+      {alert && (
+        <Alert severity="error" sx={{ marginTop: 2 }}>
+          {alert}
+        </Alert>
+      )}
+      <TableContainer component={Paper} sx={{ marginTop: 2 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Amount (₹)</TableCell>
+              <TableCell>Duration</TableCell>
+              <TableCell>Progress</TableCell>
+              <TableCell>Actions</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {budgets.map((budget) => (
+              <TableRow key={budget._id}>
+                <TableCell>{budget.name}</TableCell>
+                <TableCell>₹{budget.amount}</TableCell>
+                <TableCell>{budget.duration}</TableCell>
+                <TableCell>
+                  <ProgressBar
+                    budget={budget}
+                    onProgressCheck={handleProgressCheck}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant="outlined"
+                    color="warning"
+                    onClick={() => handleEdit(budget)}
+                    sx={{ marginRight: 1 }}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleDelete(budget._id)}
+                  >
+                    Delete
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <BudgetChart budgets={budgets} />
       <BudgetForm
         show={showForm}
         handleClose={() => {
@@ -91,7 +123,7 @@ const BudgetList = () => {
         existingBudget={selectedBudget}
         refreshBudgets={refreshBudgets}
       />
-    </div>
+    </Box>
   );
 };
 

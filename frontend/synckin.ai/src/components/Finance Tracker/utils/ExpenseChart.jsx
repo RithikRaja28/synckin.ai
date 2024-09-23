@@ -13,7 +13,7 @@ const ExpenseChart = ({ expenses }) => {
 
     if (chartRef.current && expenses.length > 0) {
       chartInstanceRef.current = new Chart(chartRef.current, {
-        type: "doughnut", // Change to 'pie' or 'doughnut' if needed
+        type: "line", // Change to 'pie' or 'doughnut' if needed
         data: {
           labels: expenses.map((expense) => expense.category),
           datasets: [
