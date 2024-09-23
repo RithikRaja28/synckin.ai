@@ -17,6 +17,7 @@ import DashboardCard from "./utils/DashboardCard";
 import ProfileDashboard from "../Profile/ProfileDashboard";
 import SettingsPage from "../Setting Page/SettingsPage";
 import ExpenseChart from "../Finance Tracker/utils/ExpenseChart";
+import BudgetList from "../Finance Tracker/Budget Tracker/BudgetList";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -176,6 +177,10 @@ const Dashboard = () => {
               <Route path="/financetracker" element={<FinanceTracker />} />
               <Route path="/family" element={<FamilyConnect />} />
               <Route path="/profile" element={<ProfileDashboard />} />
+              <Route
+                path="/budget-planning"
+                element={<BudgetList />}
+              />
               <Route path="/settings" element={<SettingsPage />} />
             </Routes>
           )}
