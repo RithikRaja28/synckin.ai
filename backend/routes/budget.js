@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const Budget = require("../models/Budget");
+const Expense = require("../models/Expense");
 
 // Verify JWT Token
 const verifyToken = (req) => {
@@ -26,15 +27,17 @@ router.post("/add", async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 
-  const { category, limit, spent = 0, period = "Monthly" } = req.body;
+  const { name, amount, duration, startDate, endDate } = req.body;
 
   try {
     const newBudget = new Budget({
-      category,
-      limit,
-      spent,
+      name,
+      amount,
+      duration,
+      startDate,
+      endDate,
       userId,
-      period,
+      expenses: [],
     });
 
     const savedBudget = await newBudget.save();
@@ -53,7 +56,7 @@ router.get("/show", async (req, res) => {
   }
 
   try {
-    const budgets = await Budget.find({ userId });
+    const budgets = await Budget.find({ userId }).populate("expenses");
     res.json(budgets);
   } catch (err) {
     console.log(err);
@@ -68,7 +71,7 @@ router.put("/update/:id", async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 
-  const { category, limit, spent, period } = req.body;
+  const { name, amount, duration, startDate, endDate } = req.body;
 
   try {
     let budget = await Budget.findOne({ _id: req.params.id, userId });
@@ -76,13 +79,11 @@ router.put("/update/:id", async (req, res) => {
       return res.status(404).json({ msg: "Budget not found" });
     }
 
-    // Update the budget details
-    budget.category = category || budget.category;
-    budget.limit = limit !== undefined ? limit : budget.limit;
-    budget.spent = spent !== undefined ? spent : budget.spent;
-    budget.period = period || budget.period;
-
-    budget.lastUpdatedDate = Date.now();
+    budget.name = name || budget.name;
+    budget.amount = amount !== undefined ? amount : budget.amount;
+    budget.duration = duration || budget.duration;
+    budget.startDate = startDate || budget.startDate;
+    budget.endDate = endDate || budget.endDate;
 
     const updatedBudget = await budget.save();
     res.json(updatedBudget);
@@ -110,6 +111,39 @@ router.delete("/delete/:id", async (req, res) => {
     }
 
     res.json({ msg: "Budget deleted" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Get budget progress
+router.get("/progress/:id", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    const budget = await Budget.findOne({
+      _id: req.params.id,
+      userId,
+    }).populate("expenses");
+    if (!budget) {
+      return res.status(404).json({ msg: "Budget not found" });
+    }
+
+    // Calculate total expenses within the budget period
+    const totalExpenses = budget.expenses.reduce((total, expense) => {
+      if (expense.date >= budget.startDate && expense.date <= budget.endDate) {
+        return total + expense.amount;
+      }
+      return total;
+    }, 0);
+
+    const progress = (totalExpenses / budget.amount) * 100;
+
+    res.json({ progress, totalExpenses, budgetAmount: budget.amount });
   } catch (err) {
     console.log(err);
     res.status(500).send("Server Error");
