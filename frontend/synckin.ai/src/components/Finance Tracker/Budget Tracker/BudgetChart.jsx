@@ -1,5 +1,8 @@
+// BudgetChart.jsx
+
 import React from "react";
 import { Bar } from "react-chartjs-2";
+import { Card } from "@mui/material"; // Add Card for a modern look
 
 const BudgetChart = ({ budgets }) => {
   const chartData = {
@@ -22,7 +25,11 @@ const BudgetChart = ({ budgets }) => {
     ],
   };
 
-  return <Bar data={chartData} />;
+  return (
+    <Card sx={{ padding: 2, marginTop: 3 }}>
+      <Bar data={chartData} />
+    </Card>
+  );
 };
 
 export default BudgetChart;
