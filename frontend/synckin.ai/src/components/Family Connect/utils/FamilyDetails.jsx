@@ -26,6 +26,8 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import EditIcon from "@mui/icons-material/Edit";
+
 
 const FamilyDetails = () => {
   const [family, setFamily] = useState(null);
@@ -39,9 +41,12 @@ const FamilyDetails = () => {
   const [tasks, setTasks] = useState([]);
   const [savingsList, setSavingsList] = useState([]);
   const [openTaskDialog, setOpenTaskDialog] = useState(false);
+  const [openEditTaskDialog, setOpenEditTaskDialog] = useState(false); // For editing task
   const [openSavingsDialog, setOpenSavingsDialog] = useState(false);
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [task, setTask] = useState({ title: "", description: "", dueDate: "" });
+  const [editTaskId, setEditTaskId] = useState(null); // Track the task being edited
+  const[loading,setLoading]=useState(false);
   const [savings, setSavings] = useState({
     goal: "",
     amount: "",
@@ -107,12 +112,15 @@ const FamilyDetails = () => {
 
   const handleAddTask = async () => {
     const token = localStorage.getItem("token");
+    setLoading(true);
     try {
-      await axios.post(
+      const newTask = await axios.post(
         "http://localhost:5000/api/family-member-task/tasks",
         { ...task, assignedTo: selectedMember, familyId: family._id },
         { headers: { "x-auth-token": token } }
       );
+
+      setTasks((prevTasks) => [...prevTasks, newTask.data]); // Optimistic update
       setSnackbar({
         open: true,
         message: "Task added successfully",
@@ -125,10 +133,11 @@ const FamilyDetails = () => {
         message: "Error adding task",
         type: "error",
       });
+    } finally {
+      setOpenTaskDialog(false);
+      setLoading(false);
     }
-    setOpenTaskDialog(false);
   };
-
   const handleAddSavings = async () => {
     const token = localStorage.getItem("token");
     try {
@@ -182,7 +191,77 @@ const FamilyDetails = () => {
     }
   };
 
-  const handleDetailsDialogClose = () => setOpenDetailsDialog(false);
+ const handleDetailsDialogClose = () => setOpenDetailsDialog(false);
+
+  const handleEditTask = (task) => {
+    setTask({
+      title: task.title,
+      description: task.description,
+      dueDate: task.dueDate,
+    });
+    setEditTaskId(task._id);
+    setOpenEditTaskDialog(true);
+  };
+
+  const handleUpdateTask = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.put(
+        `http://localhost:5000/api/family-member-task/tasks/${editTaskId}`,
+        task,
+        { headers: { "x-auth-token": token } }
+      );
+      setSnackbar({
+        open: true,
+        message: "Task updated successfully",
+        type: "success",
+      });
+      setTask({ title: "", description: "", dueDate: "" });
+    } catch (err) {
+      console.error("Error updating task:", err);
+      setSnackbar({
+        open: true,
+        message: "Error updating task",
+        type: "error",
+      });
+    }
+    
+    setOpenEditTaskDialog(false);
+  };
+
+  const handleDeleteTask = async (taskId) => {
+    console.log("Deleting task with ID:", taskId); // Log task ID
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/family-member-task/tasks/${taskId}`,
+        {
+          headers: { "x-auth-token": token },
+        }
+      );
+      console.log("Task deleted successfully"); // Log success
+      setTasks(tasks.filter((task) => task._id !== taskId));
+      setSnackbar({
+        open: true,
+        message: "Task deleted successfully",
+        type: "success",
+      });
+    } catch (err) {
+      console.error("Error deleting task:", err); // Log full error
+      setSnackbar({
+        open: true,
+        message:
+          "Error deleting task: " +
+          (err.response ? err.response.data : err.message),
+        type: "error",
+      });
+    }
+  };
+
+
+
+
+  
 
   const handleDeleteFamily = async () => {
     const token = localStorage.getItem("token");
@@ -402,6 +481,17 @@ const FamilyDetails = () => {
             {tasks.map((task) => (
               <ListItem key={task._id}>
                 <ListItemText primary={task.title} secondary={task.dueDate} />
+                {/* Add Edit and Delete Icons */}
+                <Tooltip title="Edit Task">
+                  <IconButton onClick={() => handleEditTask(task)}>
+                    <EditIcon color="primary" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Task">
+                  <IconButton onClick={() => handleDeleteTask(task._id)}>
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </Tooltip>
               </ListItem>
             ))}
           </List>
@@ -413,7 +503,7 @@ const FamilyDetails = () => {
               <ListItem key={saving._id}>
                 <ListItemText
                   primary={saving.goal}
-                  secondary={saving.targetDate}
+                  secondary={`Amount: ${saving.amount}`}
                 />
               </ListItem>
             ))}
@@ -424,17 +514,58 @@ const FamilyDetails = () => {
         </DialogActions>
       </Dialog>
 
+      <Dialog
+        open={openEditTaskDialog}
+        onClose={() => setOpenEditTaskDialog(false)}
+      >
+        <DialogTitle>Edit Task</DialogTitle>
+        <DialogContent>
+          <TextField
+            autoFocus
+            margin="dense"
+            label="Title"
+            type="text"
+            fullWidth
+            value={task.title}
+            onChange={(e) => setTask({ ...task, title: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Description"
+            type="text"
+            fullWidth
+            value={task.description}
+            onChange={(e) => setTask({ ...task, description: e.target.value })}
+          />
+          <TextField
+            margin="dense"
+            label="Due Date"
+            type="date"
+            fullWidth
+            InputLabelProps={{ shrink: true }}
+            value={task.dueDate}
+            onChange={(e) => setTask({ ...task, dueDate: e.target.value })}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditTaskDialog(false)}>Cancel</Button>
+          <Button onClick={handleUpdateTask} color="primary">
+            Update
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       {/* Snackbar */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
       >
         <MuiAlert
-          elevation={6}
-          variant="filled"
           onClose={() => setSnackbar({ ...snackbar, open: false })}
           severity={snackbar.type}
+          elevation={6}
+          variant="filled"
         >
           {snackbar.message}
         </MuiAlert>
