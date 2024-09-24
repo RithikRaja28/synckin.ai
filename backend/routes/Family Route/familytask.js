@@ -18,6 +18,7 @@ const verifyToken = (req) => {
   }
 };
 
+// Create Task
 router.post("/tasks", async (req, res) => {
   const userId = verifyToken(req);
   if (!userId) {
@@ -25,8 +26,6 @@ router.post("/tasks", async (req, res) => {
   }
 
   const { title, description, dueDate, assignedTo, familyId } = req.body;
-
-  console.log(`Adding task for user ${assignedTo} in family ${familyId}`);
 
   try {
     const task = new FamilyTask({
@@ -38,7 +37,6 @@ router.post("/tasks", async (req, res) => {
       familyId,
     });
     await task.save();
-    console.log("Task created:", task);
     res.json(task);
   } catch (err) {
     console.error("Error creating task:", err.message);
@@ -46,6 +44,7 @@ router.post("/tasks", async (req, res) => {
   }
 });
 
+// Fetch Tasks
 router.get("/tasks/:assignedTo", async (req, res) => {
   const userId = verifyToken(req);
   if (!userId) {
@@ -54,14 +53,11 @@ router.get("/tasks/:assignedTo", async (req, res) => {
 
   const { assignedTo } = req.params;
 
-  console.log(`Fetching tasks assigned to ${assignedTo}`);
-
   try {
     const tasks = await FamilyTask.find({ assignedTo }).populate(
       "assignedBy",
       "username"
     );
-    console.log("Tasks found:", tasks);
     res.json(tasks);
   } catch (err) {
     console.error("Error fetching tasks:", err.message);
@@ -69,7 +65,43 @@ router.get("/tasks/:assignedTo", async (req, res) => {
   }
 });
 
+// Update Task
+router.put("/tasks/:id", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
 
+  const { title, description, dueDate } = req.body;
+
+  try {
+    const task = await FamilyTask.findByIdAndUpdate(
+      req.params.id,
+      { title, description, dueDate },
+      { new: true }
+    );
+    res.json(task);
+  } catch (err) {
+    console.error("Error updating task:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+// Delete Task
+router.delete("/tasks/:id", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    await FamilyTask.findByIdAndDelete(req.params.id);
+    res.sendStatus(204); // No Content
+  } catch (err) {
+    console.error("Error deleting task:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 
 module.exports = router;
