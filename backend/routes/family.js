@@ -362,7 +362,6 @@ router.delete("/remove-member", async (req, res) => {
   }
 
   const { _id } = req.body;
-
   try {
     if (!_id) {
       return res.status(400).json({ msg: "Member ID (_id) is required." });
