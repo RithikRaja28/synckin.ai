@@ -4,6 +4,8 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Family = require("../models/Family");
 const nodemailer = require("nodemailer");
+const FamilySavings = require("../models/Family Model/FamilySavings");
+const FamilyTask = require("../models/Family Model/FamilyTask");
 // Verify JWT Token
 const verifyToken = (req) => {
   const token = req.headers["x-auth-token"];
@@ -360,7 +362,6 @@ router.delete("/remove-member", async (req, res) => {
   }
 
   const { _id } = req.body;
-
   try {
     if (!_id) {
       return res.status(400).json({ msg: "Member ID (_id) is required." });
@@ -401,11 +402,19 @@ router.delete("/remove-member", async (req, res) => {
       await memberUser.save();
     }
 
-    res.json({ msg: "Member removed successfully" });
+    // Remove all tasks assigned to this member
+    await FamilyTask.deleteMany({ assignedTo: _id });
+
+    // Remove all savings associated with this member
+    await FamilySavings.deleteMany({ assignedTo: _id });
+
+    res.json({ msg: "Member, their tasks, and savings removed successfully" });
   } catch (err) {
     console.error("Error removing member:", err.message);
     res.status(500).send("Server error");
   }
 });
+
+
 
 module.exports = router;
