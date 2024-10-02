@@ -1,23 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { TextField, Button, Card, Typography } from "@mui/material";
 import ScrollableFeed from "react-scrollable-feed";
+import ReactMarkdown from "react-markdown";
 import "./SuggestionComponent.css"; // For custom styling
 
 const SuggestionComponent = () => {
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState([]); // Array to hold the chat history
+  const chatEndRef = useRef(null); // Create a ref for auto-scrolling
 
   const handleSubmit = async () => {
     if (!query.trim()) return; // Avoid sending empty queries
 
     // Add user query to chat
-    setMessages([...messages, { type: "user", text: query }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { type: "user", text: query },
+    ]);
 
     try {
-      const response = await axios.post("/api/homegenie/suggestions", {
-        query,
-      });
+      const response = await axios.post(
+        "http://localhost:5000/api/homegenie/suggestions",
+        {
+          query,
+        }
+      );
       const aiResponse = response.data.suggestions;
 
       // Add AI response to chat
@@ -27,10 +35,21 @@ const SuggestionComponent = () => {
       ]);
     } catch (error) {
       console.error("Error fetching suggestions", error);
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { type: "ai", text: "Error fetching suggestions. Please try again." },
+      ]);
     }
 
     setQuery(""); // Clear the input field
   };
+
+  // Scroll to the bottom whenever messages change
+  useEffect(() => {
+    if (chatEndRef.current) {
+      chatEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
   return (
     <div className="chat-container">
@@ -42,11 +61,20 @@ const SuggestionComponent = () => {
         <ScrollableFeed className="scrollable-feed">
           {messages.map((msg, index) => (
             <div key={index} className={`message ${msg.type}`}>
-              <Card className={`message-card ${msg.type}`}>
-                <Typography variant="body1">{msg.text}</Typography>
+              <Card
+                className={`message-card ${msg.type}`}
+                style={{ padding: "10px", marginBottom: "10px" }}
+              >
+                {msg.type === "ai" ? (
+                  <ReactMarkdown>{msg.text}</ReactMarkdown> // Render AI response in Markdown
+                ) : (
+                  <Typography variant="body1">{msg.text}</Typography>
+                )}
               </Card>
             </div>
           ))}
+          <div ref={chatEndRef} />{" "}
+          {/* This div acts as the target for scrolling */}
         </ScrollableFeed>
       </div>
 
