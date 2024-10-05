@@ -14,6 +14,9 @@ const family = require("./routes/family");
 const familysavings = require("./routes/Family Route/familysavings");
 const familytask = require("./routes/Family Route/familytask");
 
+
+const homegenie = require("./AI/routes/homegenie");
+
 const app = express();
 
 app.use(express.json());
@@ -44,3 +47,4 @@ app.use("/api/debt", debt);
 app.use("/api/family", family);
 app.use("/api/family-member-task", familytask);
 app.use("/api/family-member-savings", familysavings);
+app.use("/api/homegenie", homegenie);

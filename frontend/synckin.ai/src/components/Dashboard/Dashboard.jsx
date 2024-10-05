@@ -18,6 +18,7 @@ import ProfileDashboard from "../Profile/ProfileDashboard";
 import SettingsPage from "../Setting Page/SettingsPage";
 import ExpenseChart from "../Finance Tracker/utils/ExpenseChart";
 import BudgetList from "../Finance Tracker/Budget Tracker/BudgetList";
+import HomeGenie from "../HomeGenie AI/HomeGenie";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -177,11 +178,9 @@ const Dashboard = () => {
               <Route path="/financetracker" element={<FinanceTracker />} />
               <Route path="/family" element={<FamilyConnect />} />
               <Route path="/profile" element={<ProfileDashboard />} />
-              <Route
-                path="/budget-planning"
-                element={<BudgetList />}
-              />
+              <Route path="/budget-planning" element={<BudgetList />} />
               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/homegenieAI" element={<HomeGenie />} />
             </Routes>
           )}
         </div>
