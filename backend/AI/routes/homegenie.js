@@ -190,5 +190,66 @@ router.post("/generate-shopping-list", async (req, res) => {
   }
 });
 
+router.post("/generate-recipe", async (req, res) => {
+  const { ingredients, cuisine, dietaryPreferences } = req.body;
+
+  if (!ingredients) {
+    return res
+      .status(400)
+      .json({ error: "Ingredients are required to create a recipe" });
+  }
+
+  try {
+    // Construct a query to the AI model to create a recipe
+    let formattedQuery = `Create a recipe using the following ingredients and suggest some youtube links for the following context: "${ingredients}".`;
+
+    if (cuisine) {
+      formattedQuery += ` The recipe should be for ${cuisine} cuisine.`;
+    }
+
+    if (dietaryPreferences) {
+      formattedQuery += ` Make sure it fits within these dietary preferences: ${dietaryPreferences}.`;
+    }
+
+    // Retry logic for AI suggestions from Groq
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        // Create a chat completion request using Groq or another model
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [
+            {
+              role: "user",
+              content: formattedQuery,
+            },
+          ],
+          model: "llama3-8b-8192", // Groq model
+          temperature: 0.7,
+          max_tokens: 1024,
+          top_p: 1,
+          stream: true,
+        });
+
+        // Collect the response in chunks
+        let recipe = "";
+        for await (const chunk of chatCompletion) {
+          recipe += chunk.choices[0]?.delta?.content || "";
+        }
+
+        // Send the generated recipe back to the client
+        return res.json({ recipe: recipe.trim() });
+      } catch (error) {
+        console.error("Error generating recipe:", error.message);
+        if (attempt === MAX_RETRIES - 1) {
+          return res.status(500).json({ error: "Failed to generate recipe" });
+        }
+        // Wait before retrying
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+      }
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 module.exports = router;
