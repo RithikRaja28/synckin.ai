@@ -70,6 +70,7 @@ router.post("/generate-image", upload.single("image"), async (req, res) => {
           ...form.getHeaders(), // Use form headers for multipart
           Authorization: `Bearer ${OPENAI_API_KEY}`,
         },
+        timeout: 240000,
       }
     );
 
@@ -132,5 +133,62 @@ router.post("/suggestions", async (req, res) => {
     }
   }
 });
+
+router.post("/generate-shopping-list", async (req, res) => {
+  const { input } = req.body; // Input could be a recipe, meal plan, or detected low items
+
+  if (!input) {
+    return res
+      .status(400)
+      .json({ error: "Input is required to generate a shopping list" });
+  }
+
+  try {
+    // Construct a query to the AI to generate a shopping list
+    const formattedQuery = `Based on the following input: "${input}", generate a shopping list with common groceries and ingredients required for the following context and that should be necessary.`;
+
+    // Retry logic for AI suggestions from Groq
+    for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
+      try {
+        // Create a chat completion request using Groq
+        const chatCompletion = await groq.chat.completions.create({
+          messages: [
+            {
+              role: "user",
+              content: formattedQuery,
+            },
+          ],
+          model: "llama3-8b-8192", // Specify Groq model
+          temperature: 1,
+          max_tokens: 1024,
+          top_p: 1,
+          stream: true,
+        });
+
+        // Collect the response in chunks
+        let shoppingList = "";
+        for await (const chunk of chatCompletion) {
+          shoppingList += chunk.choices[0]?.delta?.content || "";
+        }
+
+        // Send the final shopping list back to the client
+        return res.json({ shoppingList: shoppingList.trim() });
+      } catch (error) {
+        console.error("Error generating shopping list:", error.message);
+        if (attempt === MAX_RETRIES - 1) {
+          return res
+            .status(500)
+            .json({ error: "Failed to generate shopping list" });
+        }
+        // Wait before retrying
+        await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+      }
+    }
+  } catch (error) {
+    console.error("Error:", error.message);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 
 module.exports = router;

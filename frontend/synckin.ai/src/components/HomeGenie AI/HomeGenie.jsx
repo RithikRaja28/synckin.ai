@@ -4,6 +4,8 @@ import { styled } from "@mui/material/styles";
 import SuggestionComponent from "./SuggestionComponent";
 import HomeDecorComponent from "./HomeDecorComponent";
 
+import ShoppingList from "./ShoppingListAI";
+
 // Custom Styled Tabs
 const StyledTabs = styled(Tabs)({
   "& .MuiTabs-indicator": {
@@ -54,6 +56,7 @@ const HomeGenie = () => {
         >
           <StyledTab label="Suggestions" />
           <StyledTab label="Home Decor" />
+          <StyledTab label="Shopping List" /> {/* New Shopping List tab */}
         </StyledTabs>
       </Box>
 
@@ -61,6 +64,8 @@ const HomeGenie = () => {
       <div>
         {activeTab === 0 && <SuggestionComponent />}
         {activeTab === 1 && <HomeDecorComponent />}
+        {activeTab === 2 && <ShoppingList />}{" "}
+        {/* Render Shopping List component */}
       </div>
     </div>
   );
