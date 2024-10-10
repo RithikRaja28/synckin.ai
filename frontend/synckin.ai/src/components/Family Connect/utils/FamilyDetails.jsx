@@ -43,9 +43,11 @@ const FamilyDetails = () => {
   const [openTaskDialog, setOpenTaskDialog] = useState(false);
   const [openEditTaskDialog, setOpenEditTaskDialog] = useState(false); // For editing task
   const [openSavingsDialog, setOpenSavingsDialog] = useState(false);
+  const [openEditSavingsDialog, setOpenEditSavingsDialog] = useState(false); 
   const [openDetailsDialog, setOpenDetailsDialog] = useState(false);
   const [task, setTask] = useState({ title: "", description: "", dueDate: "" });
-  const [editTaskId, setEditTaskId] = useState(null); // Track the task being edited
+  const [editTaskId, setEditTaskId] = useState(null);
+  const [editSavingsId, setEditSavingsId] = useState(null); // Track the task being edited
   const[loading,setLoading]=useState(false);
   const [savings, setSavings] = useState({
     goal: "",
@@ -309,6 +311,64 @@ const FamilyDetails = () => {
     }
   };
 
+  const handleEditSavings = (saving) => {
+    setSavings({
+      goal: saving.goal,
+      amount: saving.amount,
+      targetDate: saving.targetDate,
+    });
+    setEditSavingsId(saving._id);
+    setOpenEditSavingsDialog(true);
+  };
+
+  const handleUpdateSavings = async () => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.put(
+        `http://localhost:5000/api/family-member-savings/savings/${editSavingsId}`,
+        savings,
+        { headers: { "x-auth-token": token } }
+      );
+      setSnackbar({
+        open: true,
+        message: "Savings updated successfully",
+        type: "success",
+      });
+      setSavings({ goal: "", amount: "", targetDate: "" });
+    } catch (err) {
+      console.error("Error updating savings:", err);
+      setSnackbar({
+        open: true,
+        message: "Error updating savings",
+        type: "error",
+      });
+    }
+
+    setOpenEditSavingsDialog(false);
+  };
+
+  const handleDeleteSavings = async (savingsId) => {
+    const token = localStorage.getItem("token");
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/family-member-savings/savings/${savingsId}`,
+        { headers: { "x-auth-token": token } }
+      );
+      setSavingsList(savingsList.filter((saving) => saving._id !== savingsId));
+      setSnackbar({
+        open: true,
+        message: "Savings deleted successfully",
+        type: "success",
+      });
+    } catch (err) {
+      setSnackbar({
+        open: true,
+        message: "Error deleting savings",
+        type: "error",
+      });
+    }
+  };
+
   if (error) {
     return <div>{error}</div>;
   }
@@ -503,8 +563,19 @@ const FamilyDetails = () => {
               <ListItem key={saving._id}>
                 <ListItemText
                   primary={saving.goal}
-                  secondary={`Amount: ${saving.amount}`}
+                  secondary={`Amount: ${saving.amount}, Target Date: ${saving.targetDate}`}
                 />
+                {/* Add Edit and Delete Icons for Savings */}
+                <Tooltip title="Edit Savings">
+                  <IconButton onClick={() => handleEditSavings(saving)}>
+                    <EditIcon color="primary" />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title="Delete Savings">
+                  <IconButton onClick={() => handleDeleteSavings(saving._id)}>
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                </Tooltip>
               </ListItem>
             ))}
           </List>
@@ -552,6 +623,39 @@ const FamilyDetails = () => {
           <Button onClick={handleUpdateTask} color="primary">
             Update
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog
+        open={openEditSavingsDialog}
+        onClose={() => setOpenEditSavingsDialog(false)}
+      >
+        <DialogTitle>Edit Savings</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Goal"
+            value={savings.goal}
+            onChange={(e) => setSavings({ ...savings, goal: e.target.value })}
+          />
+          <TextField
+            label="Amount"
+            value={savings.amount}
+            onChange={(e) => setSavings({ ...savings, amount: e.target.value })}
+          />
+          <TextField
+            label="Target Date"
+            type="date"
+            InputLabelProps={{ shrink: true }}
+            value={savings.targetDate}
+            onChange={(e) =>
+              setSavings({ ...savings, targetDate: e.target.value })
+            }
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenEditSavingsDialog(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleUpdateSavings}>Update</Button>
         </DialogActions>
       </Dialog>
 
