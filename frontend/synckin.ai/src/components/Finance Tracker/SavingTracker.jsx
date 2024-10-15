@@ -131,6 +131,7 @@ const SavingsPage = () => {
             setFormVisible(!formVisible);
             setEditing(null);
           }}
+          style={{ borderRadius: "20px", padding: "8px 16px" }}
         >
           {formVisible ? "Cancel" : "Add Saving Goal"}
         </Button>

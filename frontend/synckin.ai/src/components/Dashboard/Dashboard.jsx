@@ -19,6 +19,11 @@ import SettingsPage from "../Setting Page/SettingsPage";
 import ExpenseChart from "../Finance Tracker/utils/ExpenseChart";
 import BudgetList from "../Finance Tracker/Budget Tracker/BudgetList";
 import HomeGenie from "../HomeGenie AI/HomeGenie";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import { Typography, Box } from "@mui/material";
+import { styled } from "@mui/system";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -100,6 +105,22 @@ const Dashboard = () => {
   const handleProfileClick = () => {
     setShowProfile(true); // Show profile dashboard
   };
+
+  const StyledDashboard = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(4),
+  backgroundColor: '#f5f5f5',
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+// Custom card styling
+const StyledCard = styled(Card)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: '15px',
+  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+}));
 
   return (
     <div className="d-flex vh-100 w-100">
