@@ -69,5 +69,53 @@ router.get("/savings/:assignedTo", async (req, res) => {
   }
 });
 
+// Update Savings
+router.put("/savings/:id", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const { goal, amount, targetDate } = req.body;
+
+  try {
+    const savings = await FamilySavings.findByIdAndUpdate(
+      req.params.id,
+      { goal, amount, targetDate },
+      { new: true }
+    );
+
+    if (!savings) {
+      return res.status(404).send("Savings not found");
+    }
+
+    res.json(savings);
+  } catch (err) {
+    console.error("Error updating savings:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
+
+
+// Delete Savings
+router.delete("/savings/:id", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  try {
+    const savings = await FamilySavings.findByIdAndDelete(req.params.id);
+
+    if (!savings) {
+      return res.status(404).send("Savings not found");
+    }
+
+    res.sendStatus(204); // No Content
+  } catch (err) {
+    console.error("Error deleting savings:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 module.exports = router;

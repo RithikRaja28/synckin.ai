@@ -1,0 +1,122 @@
+/* Global Styling */
+
+.navbar {
+  padding: 1rem 2rem;
+}
+
+.nav-btn {
+  font-weight: bold;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Hero Section */
+.hero-section {
+  background-color: #1a1a1a;
+  min-height: 90vh;
+  padding-top: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.hero-text h1 {
+  color: #9c27b0;
+  font-size: 4rem;
+  font-weight: 600;
+}
+
+.hero-description {
+  color: #ccc;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+.hero-buttons {
+  margin-top: 30px;
+}
+
+.hero-btn {
+  padding: 0.8rem 2.5rem;
+  font-size: 1.2rem;
+}
+
+.hero-btn-outline {
+  padding: 0.8rem 2.5rem;
+  font-size: 1.2rem;
+  border: 2px solid #9c27b0;
+  color: #9c27b0;
+}
+
+.hero-3d img {
+  width: 80%;
+  animation: float 4s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+/* Features Section */
+.features-section {
+  padding: 80px 10%;
+  background-color: #181818;
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2.5rem;
+  color: #9c27b0;
+  margin-bottom: 50px;
+}
+
+.feature-card {
+  background-color: #242424;
+  padding: 30px;
+  border-radius: 10px;
+}
+
+/* How It Works Section */
+.how-it-works-section {
+  background-color: #1a1a1a;
+  padding: 80px 10%;
+}
+
+.step-title {
+  color: #9c27b0;
+  font-size: 1.8rem;
+  margin-bottom: 10px;
+}
+
+/* Subscription Plans */
+.plans-section {
+  background-color: #181818;
+  padding: 80px 10%;
+}
+
+.plan-card {
+  background-color: #242424;
+  padding: 30px;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.subscribe-btn {
+  margin-top: 20px;
+}
+
+/* Footer */
+.footer-section {
+  background-color: #121212;
+  padding: 20px 0;
+  text-align: center;
+  color: #777;
+}
