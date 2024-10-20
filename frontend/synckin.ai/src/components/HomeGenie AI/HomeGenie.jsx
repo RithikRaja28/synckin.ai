@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import { Tabs, Tab, Box } from "@mui/material";
+import React, { useState, useContext } from "react";
+import { Tabs, Tab, Box, Typography, Button } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import SuggestionComponent from "./SuggestionComponent";
 import HomeDecorComponent from "./HomeDecorComponent";
 import ShoppingList from "./ShoppingListAI";
 import RecipeGeneratorAI from "./RecipeGeneratorAI";
+import { AuthContext } from "../../context/AuthContext"; // Import the AuthContext to access user details
 
 // Custom Styled Tabs with light theme enhancements
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -46,10 +47,15 @@ const StyledTab = styled((props) => <Tab {...props} />)(({ theme }) => ({
 
 const HomeGenie = () => {
   const [activeTab, setActiveTab] = useState(0);
+  const { auth } = useContext(AuthContext); // Get user details from AuthContext
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
   };
+
+  // Check the subscription status
+  const isSubscribed = auth.user?.subscription?.status;
+  console.log(isSubscribed);  
 
   return (
     <div
@@ -73,50 +79,80 @@ const HomeGenie = () => {
         HomeGenie AI
       </h2>
 
-      {/* Custom Styled Tabs for switching between components */}
-      <Box
-        sx={{
-          borderBottom: 1,
-          borderColor: "divider",
-          marginBottom: "20px",
-          padding: "10px",
-          borderRadius: "12px",
-          boxShadow: "0px 2px 15px rgba(0, 0, 0, 0.05)", // Soft shadow for tab container
-          backgroundColor: "#fff", // White background for the tab container
-        }}
-      >
-        <StyledTabs
-          value={activeTab}
-          onChange={handleTabChange}
-          aria-label="home-genie-tabs"
-          variant="scrollable"
-          scrollButtons="auto"
-          allowScrollButtonsMobile
-        >
-          <StyledTab label="Suggestions" />
-          <StyledTab label="Home Decor" />
-          <StyledTab label="Shopping List" />
-          <StyledTab label ="Recipe Generator" />
-        </StyledTabs>
-      </Box>
+      {isSubscribed ? (
+        <>
+          {/* Custom Styled Tabs for switching between components */}
+          <Box
+            sx={{
+              borderBottom: 1,
+              borderColor: "divider",
+              marginBottom: "20px",
+              padding: "10px",
+              borderRadius: "12px",
+              boxShadow: "0px 2px 15px rgba(0, 0, 0, 0.05)", // Soft shadow for tab container
+              backgroundColor: "#fff", // White background for the tab container
+            }}
+          >
+            <StyledTabs
+              value={activeTab}
+              onChange={handleTabChange}
+              aria-label="home-genie-tabs"
+              variant="scrollable"
+              scrollButtons="auto"
+              allowScrollButtonsMobile
+            >
+              <StyledTab label="Suggestions" />
+              <StyledTab label="Home Decor" />
+              <StyledTab label="Shopping List" />
+              <StyledTab label="Recipe Generator" />
+            </StyledTabs>
+          </Box>
 
-      {/* Render components based on active tab */}
-      <div
-        style={{
-          maxWidth: "100%",
-          overflowX: "auto",
-          padding: "20px",
-          backgroundColor: "#fff", // White background for the content area
-          borderRadius: "12px",
-          boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)", // Soft shadow for content area
-          transition: "all 0.3s ease-in-out",
-        }}
-      >
-        {activeTab === 0 && <SuggestionComponent />}
-        {activeTab === 1 && <HomeDecorComponent />}
-        {activeTab === 2 && <ShoppingList />}
-        {activeTab === 3 && <RecipeGeneratorAI />}
-      </div>
+          {/* Render components based on active tab */}
+          <div
+            style={{
+              maxWidth: "100%",
+              overflowX: "auto",
+              padding: "20px",
+              backgroundColor: "#fff", // White background for the content area
+              borderRadius: "12px",
+              boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)", // Soft shadow for content area
+              transition: "all 0.3s ease-in-out",
+            }}
+          >
+            {activeTab === 0 && <SuggestionComponent />}
+            {activeTab === 1 && <HomeDecorComponent />}
+            {activeTab === 2 && <ShoppingList />}
+            {activeTab === 3 && <RecipeGeneratorAI />}
+          </div>
+        </>
+      ) : (
+        // If the user is not subscribed, show this message
+        <div
+          style={{
+            padding: "20px",
+            backgroundColor: "#fff",
+            borderRadius: "12px",
+            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)", // Soft shadow for content area
+          }}
+        >
+          <Typography variant="h6" color="error" align="center">
+            Subscription Required
+          </Typography>
+          <Typography
+            variant="body1"
+            align="center"
+            style={{ marginBottom: "20px" }}
+          >
+            To access HomeGenie AI features, you need an active subscription.
+          </Typography>
+          <div style={{ textAlign: "center" }}>
+            <Button variant="contained" color="primary">
+              Buy Subscription
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

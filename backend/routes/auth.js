@@ -86,6 +86,12 @@ router.post(
         return res.status(400).json({ msg: "Invalid Credentials" });
       }
 
+      if (user.subscription.endDate && new Date() > user.subscription.endDate) {
+        user.subscription.status = false; // Deactivate subscription if expired
+        await user.save();
+      }
+
+
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         return res.status(400).json({ msg: "Invalid Credentials" });
@@ -208,5 +214,33 @@ router.put(
     }
   }
 );
+
+// Subscribe a user
+router.post("/subscribe", authmiddleware, async (req, res) => {
+    try {
+        let user = await User.findById(req.user.id);
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        // Calculate subscription end date (e.g., 1 month from now)
+        const currentDate = new Date();
+        const oneMonthLater = new Date(currentDate.setMonth(currentDate.getMonth() + 1));
+
+        // Update user subscription details
+        user.subscription.status = true;
+        user.subscription.startDate = new Date();
+        user.subscription.endDate = oneMonthLater;
+
+        await user.save();
+
+        res.json({ msg: "Subscription activated successfully", subscription: user.subscription });
+    } catch (err) {
+        console.error("Error subscribing user:", err.message);
+        res.status(500).send("Server error");
+    }
+});
+
 
 module.exports = router;
