@@ -5,7 +5,9 @@ import SuggestionComponent from "./SuggestionComponent";
 import HomeDecorComponent from "./HomeDecorComponent";
 import ShoppingList from "./ShoppingListAI";
 import RecipeGeneratorAI from "./RecipeGeneratorAI";
+
 import { AuthContext } from "../../context/AuthContext"; // Import the AuthContext to access user details
+import SubscriptionPage from "../Subscription/SubscriptionPage";
 
 // Custom Styled Tabs with light theme enhancements
 const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -55,7 +57,7 @@ const HomeGenie = () => {
 
   // Check the subscription status
   const isSubscribed = auth.user?.subscription?.status;
-  console.log(isSubscribed);  
+  console.log(isSubscribed);
 
   return (
     <div
@@ -65,23 +67,22 @@ const HomeGenie = () => {
         backgroundColor: "#f8f9fc", // Light background for the entire page
       }}
     >
-      <h2
-        style={{
-          marginBottom: "20px",
-          marginTop: "20px",
-          textAlign: "center",
-          color: "#444",
-          fontSize: "2rem",
-          fontWeight: "bold",
-        }}
-        className="mb-4"
-      >
-        HomeGenie AI
-      </h2>
-
       {isSubscribed ? (
         <>
           {/* Custom Styled Tabs for switching between components */}
+          <h2
+            style={{
+              marginBottom: "20px",
+              marginTop: "20px",
+              textAlign: "center",
+              color: "#444",
+              fontSize: "2rem",
+              fontWeight: "bold",
+            }}
+            className="mb-4"
+          >
+            HomeGenie AI
+          </h2>
           <Box
             sx={{
               borderBottom: 1,
@@ -127,31 +128,8 @@ const HomeGenie = () => {
           </div>
         </>
       ) : (
-        // If the user is not subscribed, show this message
-        <div
-          style={{
-            padding: "20px",
-            backgroundColor: "#fff",
-            borderRadius: "12px",
-            boxShadow: "0px 2px 10px rgba(0, 0, 0, 0.05)", // Soft shadow for content area
-          }}
-        >
-          <Typography variant="h6" color="error" align="center">
-            Subscription Required
-          </Typography>
-          <Typography
-            variant="body1"
-            align="center"
-            style={{ marginBottom: "20px" }}
-          >
-            To access HomeGenie AI features, you need an active subscription.
-          </Typography>
-          <div style={{ textAlign: "center" }}>
-            <Button variant="contained" color="primary">
-              Buy Subscription
-            </Button>
-          </div>
-        </div>
+        // If the user is not subscribed, render the SubscriptionPage component
+        <SubscriptionPage />
       )}
     </div>
   );

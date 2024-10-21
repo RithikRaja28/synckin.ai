@@ -1,11 +1,37 @@
 import React, { useContext } from "react";
 import { Navbar, Nav, Form, FormControl, Dropdown } from "react-bootstrap";
-import { FaBell, FaUserCircle } from "react-icons/fa";
+import { FaBell, FaUserCircle, FaCrown } from "react-icons/fa";
 import { AuthContext } from "../../../context/AuthContext";
 import { Link } from "react-router-dom"; // Import Link for routing
+import { styled } from "@mui/material/styles";
+
+const ShiningText = styled("span")({
+  position: "relative",
+  display: "inline-block",
+  overflow: "hidden",
+  borderRadius: "10px",
+  padding: "0 10px",
+  "&:before": {
+    content: "''",
+    position: "absolute",
+    top: 0,
+    left: "-100%",
+    height: "100%",
+    width: "100%",
+    background:
+      "linear-gradient(120deg, transparent, rgba(255,255,255,0.7), transparent)",
+    animation: "shimmer 2s infinite",
+  },
+  "@keyframes shimmer": {
+    "0%": { left: "-100%" },
+    "50%": { left: "100%" },
+    "100%": { left: "100%" },
+  },
+});
 
 const Header = ({ onProfileClick }) => {
-  const { logout } = useContext(AuthContext); // Context for handling logout
+  const { auth, logout } = useContext(AuthContext);
+  const isSubscribed = auth.user?.subscription?.status;
 
   return (
     <Navbar
@@ -41,9 +67,29 @@ const Header = ({ onProfileClick }) => {
 
         {/* Right-hand Side Icons */}
         <Nav className="ml-auto d-flex align-items-center">
+          {/* Subscription Status: If not subscribed, show "Subscribe" with crown icon */}
+          {!isSubscribed ? (
+            <Nav.Link
+              as={Link}
+              to="/subscribe"
+              className="d-flex align-items-center text-warning"
+            >
+              <FaCrown className="mr-2" />
+              <ShiningText className="ms-2">Subscribe</ShiningText>
+            </Nav.Link>
+          ) : (
+            <Nav.Link as={Link} to="/dashboard" className="text-warning">
+              <ShiningText>
+                <FaCrown />
+              </ShiningText>
+            </Nav.Link>
+          )}
+
           <Nav.Link as={Link} to="/dashboard/notifications">
             <FaBell className="text-light" />
           </Nav.Link>
+
+          {/* Profile Dropdown */}
 
           {/* Profile Dropdown */}
           <Dropdown align="end" className="ms-3">
