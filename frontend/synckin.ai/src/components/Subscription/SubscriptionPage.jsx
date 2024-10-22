@@ -21,7 +21,6 @@ const StyledButton = styled(Button)(({ theme }) => ({
   padding: "12px 24px",
   fontSize: "1.2rem",
   borderRadius: "25px",
-  transition: "all 0.3s ease",
   "&:hover": {
     backgroundColor: "#125e9c",
     boxShadow: "0px 6px 25px rgba(25, 118, 210, 0.4)", // Hover effect
@@ -37,7 +36,6 @@ const AnimatedCard = styled(Card)(({ theme }) => ({
   transition: "all 0.3s ease",
   padding: "30px",
   backgroundImage: "linear-gradient(135deg, #f0f4ff 30%, #ffffff 90%)", // Subtle gradient
-  transition: "all 0.4s ease",
   "&:hover": {
     transform: "translateY(-10px)", // Lift effect on hover
     boxShadow: "0px 10px 30px rgba(0, 0, 0, 0.2)",
