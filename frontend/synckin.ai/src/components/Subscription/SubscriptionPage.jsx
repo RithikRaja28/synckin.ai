@@ -11,7 +11,14 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { CheckCircle, CreditCard } from "@mui/icons-material";
-import "bootstrap/dist/css/bootstrap.min.css"; // Bootstrap for grid system
+import { loadStripe } from "@stripe/stripe-js"; // Load Stripe
+import { Elements } from "@stripe/react-stripe-js"; // Stripe Elements wrapper
+import axios from "axios"; // Axios for making API requests
+import "bootstrap/dist/css/bootstrap.min.css";
+
+const stripePromise = loadStripe(
+  "pk_test_51QCkgUAuedRxnYBSyxg6dxRGyljpb4pa90OEGVticPnyMDYc3YJBt8hbcWABvyituvVpgda8ZbdVIdz9o9LEVwjN00UBLUjhl5"
+);
 
 // Styled components for the buttons to make them more visually appealing
 const StyledButton = styled(Button)(({ theme }) => ({
@@ -43,130 +50,156 @@ const AnimatedCard = styled(Card)(({ theme }) => ({
 }));
 
 const SubscriptionPage = () => {
+  const handleCheckout = async (price) => {
+    try {
+      const token = localStorage.getItem("token"); // Get user's auth token
+      const response = await axios.post(
+        "http://localhost:5000/api/stripe/create-checkout-session",
+        { price },
+        {
+          headers: {
+            "x-auth-token": token,
+          },
+        }
+      );
+
+      const { id } = response.data;
+      const stripe = await stripePromise;
+      await stripe.redirectToCheckout({ sessionId: id });
+    } catch (error) {
+      console.error("Error creating checkout session:", error);
+      alert("Failed to initiate payment. Please try again.");
+    }
+  };
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        paddingTop: "40px",
-      }}
-    >
-      {/* Hero Section */}
+    <Elements stripe={stripePromise}>
       <Box
         sx={{
-          padding: "40px 20px",
-          background: "linear-gradient(135deg, #e0ecff 20%, #ffffff 100%)",
-          textAlign: "center",
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
+          paddingTop: "40px",
         }}
       >
-        <Typography variant="h3" sx={{ fontWeight: "bold", color: "#333" }}>
-          Unlock Premium AI Features
-        </Typography>
-        <Typography
-          variant="h6"
-          sx={{ marginTop: "15px", fontWeight: "400", color: "#555" }}
+        {/* Hero Section */}
+        <Box
+          sx={{
+            padding: "40px 20px",
+            background: "linear-gradient(135deg, #e0ecff 20%, #ffffff 100%)",
+            textAlign: "center",
+          }}
         >
-          Get exclusive access to AI-generated suggestions, home decor ideas,
-          personalized shopping lists, and more!
-        </Typography>
-        <StyledButton
-          variant="contained"
-          color="primary"
-          size="large"
-          sx={{ marginTop: "30px", padding: "10px 40px", fontSize: "1.3rem" }}
-          startIcon={<CreditCard />}
-        >
-          Subscribe Now
-        </StyledButton>
-      </Box>
+          <Typography variant="h3" sx={{ fontWeight: "bold", color: "#333" }}>
+            Unlock Premium AI Features
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{ marginTop: "15px", fontWeight: "400", color: "#555" }}
+          >
+            Get exclusive access to AI-generated suggestions, home decor ideas,
+            personalized shopping lists, and more!
+          </Typography>
+          <StyledButton
+            variant="contained"
+            color="primary"
+            size="large"
+            sx={{ marginTop: "30px", padding: "10px 40px", fontSize: "1.3rem" }}
+            startIcon={<CreditCard />}
+            onClick={() => handleCheckout(69)}
+          >
+            Subscribe Now
+          </StyledButton>
+        </Box>
 
-      {/* Subscription Plan Section */}
-      <Container className="mt-5" style={{ flex: "1 0 auto" }}>
-        <Grid container spacing={4} justifyContent="center">
-          {/* Basic Plan */}
-          <Grid item xs={12} md={6}>
-            <AnimatedCard>
-              {/* Badge for extra visibility */}
-              <Chip
-                label="Most Popular"
-                color="primary"
-                sx={{
-                  position: "absolute",
-                  top: "20px",
-                  left: "20px",
-                  fontSize: "0.9rem",
-                  fontWeight: "bold",
-                }}
-              />
-              <CardContent>
-                <Typography
-                  variant="h4"
+        {/* Subscription Plan Section */}
+        <Container className="mt-5" style={{ flex: "1 0 auto" }}>
+          <Grid container spacing={4} justifyContent="center">
+            {/* Basic Plan */}
+            <Grid item xs={12} md={6}>
+              <AnimatedCard>
+                {/* Badge for extra visibility */}
+                <Chip
+                  label="Most Popular"
+                  color="primary"
                   sx={{
+                    position: "absolute",
+                    top: "20px",
+                    left: "20px",
+                    fontSize: "0.9rem",
                     fontWeight: "bold",
-                    textAlign: "center",
-                    color: "#1976d2",
-                    marginBottom: "20px",
                   }}
-                >
-                  Basic Plan
-                </Typography>
-                <Typography
-                  variant="h3"
-                  sx={{
-                    textAlign: "center",
-                    fontWeight: "bold",
-                    color: "#333",
-                    marginBottom: "10px",
-                  }}
-                >
-                  ₹199
-                </Typography>
-                <Typography
-                  variant="h6"
-                  color="textSecondary"
-                  sx={{ textAlign: "center", color: "#777" }}
-                >
-                  per month
-                </Typography>
-                <ul
-                  className="list-unstyled"
-                  style={{
-                    textAlign: "center",
-                    fontSize: "1.1rem",
-                    lineHeight: "2.2",
-                    marginTop: "20px",
-                  }}
-                >
-                  <li>
-                    <CheckCircle color="primary" /> Access AI Suggestions
-                  </li>
-                  <li>
-                    <CheckCircle color="primary" /> Recipe Generator
-                  </li>
-                  <li>
-                    <CheckCircle color="primary" /> Home Decor Ideas
-                  </li>
-                  <li>
-                    <CheckCircle color="primary" /> Personalized Shopping Lists
-                  </li>
-                </ul>
-                <Box textAlign="center" sx={{ marginTop: "30px" }}>
-                  <StyledButton
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    startIcon={<CreditCard />}
+                />
+                <CardContent>
+                  <Typography
+                    variant="h4"
+                    sx={{
+                      fontWeight: "bold",
+                      textAlign: "center",
+                      color: "#1976d2",
+                      marginBottom: "20px",
+                    }}
                   >
-                    Subscribe for ₹199/month
-                  </StyledButton>
-                </Box>
-              </CardContent>
-            </AnimatedCard>
+                    Basic Plan
+                  </Typography>
+                  <Typography
+                    variant="h3"
+                    sx={{
+                      textAlign: "center",
+                      fontWeight: "bold",
+                      color: "#333",
+                      marginBottom: "10px",
+                    }}
+                  >
+                    ₹69
+                  </Typography>
+                  <Typography
+                    variant="h6"
+                    color="textSecondary"
+                    sx={{ textAlign: "center", color: "#777" }}
+                  >
+                    per month
+                  </Typography>
+                  <ul
+                    className="list-unstyled"
+                    style={{
+                      textAlign: "center",
+                      fontSize: "1.1rem",
+                      lineHeight: "2.2",
+                      marginTop: "20px",
+                    }}
+                  >
+                    <li>
+                      <CheckCircle color="primary" /> Access AI Suggestions
+                    </li>
+                    <li>
+                      <CheckCircle color="primary" /> Recipe Generator
+                    </li>
+                    <li>
+                      <CheckCircle color="primary" /> Home Decor Ideas
+                    </li>
+                    <li>
+                      <CheckCircle color="primary" /> Personalized Shopping
+                      Lists
+                    </li>
+                  </ul>
+                  <Box textAlign="center" sx={{ marginTop: "30px" }}>
+                    <StyledButton
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      startIcon={<CreditCard />}
+                      onClick={() => handleCheckout(69)}
+                    >
+                      Subscribe for ₹69/month
+                    </StyledButton>
+                  </Box>
+                </CardContent>
+              </AnimatedCard>
+            </Grid>
           </Grid>
-        </Grid>
-      </Container>
-    </Box>
+        </Container>
+      </Box>
+    </Elements>
   );
 };
 
