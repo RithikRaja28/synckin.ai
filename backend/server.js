@@ -13,6 +13,7 @@ const debt = require("./routes/debt");
 const family = require("./routes/family");
 const familysavings = require("./routes/Family Route/familysavings");
 const familytask = require("./routes/Family Route/familytask");
+const payment = require("./routes/payment");
 
 
 const homegenie = require("./AI/routes/homegenie");
@@ -48,3 +49,4 @@ app.use("/api/family", family);
 app.use("/api/family-member-task", familytask);
 app.use("/api/family-member-savings", familysavings);
 app.use("/api/homegenie", homegenie);
+app.use("/api/stripe", payment);
