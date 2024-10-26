@@ -1,183 +1,248 @@
-import React, { useState, useEffect } from "react";
-import { AppBar, Toolbar, Button, Typography, Grid, Container, Box } from "@mui/material";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { motion } from "framer-motion";
-
-// Styled components
-const Navbar = styled(AppBar)`
-  background-color: ${(props) => (props.scroll ? "#111" : "transparent")};
-  box-shadow: ${(props) => (props.scroll ? "0px 4px 12px rgba(0, 0, 0, 0.2)" : "none")};
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  padding: 1rem 2rem;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-`;
-
-const NavbarButton = styled(Button)`
-  color: white;
-  font-weight: bold;
-  &:hover {
-    background-color: #9c27b0;
-    color: white;
-  }
-`;
-
-const HeroSection = styled(motion.section)`
-  background-color: #1a1a1a;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding-top: 50px;
-`;
-
-const HeroText = styled.div`
-  h1 {
-    font-size: 4rem;
-    color: #9c27b0;
-    margin-bottom: 1.5rem;
-  }
-  p {
-    color: #ccc;
-    font-size: 1.3rem;
-    margin-bottom: 2rem;
-  }
-`;
-
-const HeroButtons = styled.div`
-  display: flex;
-  gap: 1rem;
-`;
-
-const FeaturesSection = styled.section`
-  background-color: #181818;
-  padding: 80px 0;
-`;
-
-const FeatureCard = styled(motion.div)`
-  background-color: #242424;
-  padding: 30px;
-  border-radius: 10px;
-  color: white;
-  text-align: center;
-  margin-bottom: 2rem;
-`;
-
-const SectionTitle = styled.h2`
-  color: #9c27b0;
-  text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 50px;
-`;
-
-const Footer = styled.footer`
-  background-color: #121212;
-  padding: 20px 0;
-  color: #777;
-  text-align: center;
-`;
+import React from "react";
+import { Container, Row, Col } from "react-bootstrap";
+import {
+  Typography,
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  Box,
+  Divider,
+} from "@mui/material";
+import HomeIcon from "@mui/icons-material/Home";
+import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
+import Navbar from "./Navbar";
 
 const LandingPage = () => {
-  const [scroll, setScroll] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScroll(window.scrollY > 50);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
-
   return (
-    <div>
-      {/* Navbar */}
-      <Navbar scroll={scroll}>
-        <Toolbar>
-          <Typography variant="h6" style={{ flexGrow: 1, fontWeight: "bold", color: "#fff" }}>
-            Synckin.ai
-          </Typography>
-          <NavbarButton component={Link} to="/login">
-            Login
-          </NavbarButton>
-          <NavbarButton component={Link} to="/signup">
-            Sign Up
-          </NavbarButton>
-        </Toolbar>
-      </Navbar>
-
-      {/* Hero Section */}
-      <HeroSection initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.2 }}>
+    <>
+      <Navbar />
+      <div
+        style={{
+          backgroundColor: "#121212", // Dark background
+          color: "white",
+          minHeight: "100vh",
+          padding: "50px 0",
+        }}
+      >
         <Container>
-          <Grid container spacing={4} alignItems="center">
-            <Grid item xs={12} md={6}>
-              <HeroText>
-                <h1>Empower Your Household with AI-Driven Management</h1>
-                <p>Manage, track, and enhance your home with personalized AI solutions.</p>
-                <HeroButtons>
-                  <Button variant="contained" color="primary" component={Link} to="/signup">
-                    Get Started
-                  </Button>
-                  <Button variant="outlined" color="secondary" component={Link} to="/features">
-                    Explore Features
-                  </Button>
-                </HeroButtons>
-              </HeroText>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <Box
-                component={motion.div}
-                animate={{ y: [0, -20, 0] }}
-                transition={{ repeat: Infinity, duration: 2 }}
+          {/* Hero Section */}
+          <Row className="align-items-center">
+            <Col md={6}>
+              <Typography
+                variant="h2"
+                component="h1"
+                gutterBottom
+                sx={{ fontWeight: "bold", color: "#2196f3" }} // Blue primary color
               >
-                <img
-                  src="/path/to/3d-image.png"
-                  alt="3D AI Illustration"
-                  style={{ width: "100%", borderRadius: "10px" }}
-                />
+                Welcome to Synckin.ai
+              </Typography>
+              <Typography
+                variant="h6"
+                component="p"
+                gutterBottom
+                sx={{ color: "#b0bec5", fontSize: "18px" }}
+              >
+                Manage your household effortlessly with personalized AI
+                services.
+              </Typography>
+              <Button
+                variant="contained"
+                size="large"
+                href="#features"
+                sx={{
+                  backgroundColor: "#2196f3", // Blue button
+                  color: "white",
+                  marginTop: "20px",
+                  "&:hover": { backgroundColor: "#1976d2" }, // Darker blue on hover
+                }}
+              >
+                Get Started
+              </Button>
+            </Col>
+            <Col md={6}>
+              {/* Embed Spline 3D Model */}
+              <Box
+                sx={{
+                  width: "100%",
+                  height: "500px",
+                  borderRadius: "15px",
+                  overflow: "hidden",
+                  border: "2px solid #2196f3", // Blue border for the model
+                  position: "relative",
+                }}
+              >
+                <iframe
+                  src="https://my.spline.design/minihomeconditionallogiccopy-bd806f165d161ec4198ca759fde3801a/"
+                  frameBorder="0"
+                  width="100%"
+                  height="100%"
+                  title="Spline 3D Model"
+                  style={{
+                    border: "none",
+                    borderRadius: "15px",
+                    overflow: "hidden",
+                  }}
+                ></iframe>
+                {/* Note about using WASD keys */}
+                <Box
+                  sx={{
+                    position: "absolute",
+                    bottom: "10px",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    backgroundColor: "rgba(0, 0, 0, 0.7)",
+                    color: "white",
+                    padding: "8px 12px",
+                    borderRadius: "8px",
+                    fontSize: "14px",
+                  }}
+                >
+                  Use WASD keys to navigate in the 3D scene
+                </Box>
               </Box>
+            </Col>
+          </Row>
+          {/* Divider between sections */}
+          <Divider sx={{ backgroundColor: "#2196f3", margin: "50px 0" }} />{" "}
+          {/* Blue divider */}
+          {/* Features Section */}
+          <section id="features">
+            <Typography
+              variant="h4"
+              component="h2"
+              gutterBottom
+              sx={{ fontWeight: "bold", textAlign: "center", color: "#2196f3" }} // Blue primary color
+            >
+              Features
+            </Typography>
+            <Grid container spacing={4} justifyContent="center">
+              <Grid item xs={12} md={4}>
+                <Card
+                  sx={{
+                    backgroundColor: "#1f1f1f",
+                    color: "white",
+                    border: "1px solid #2196f3",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                    transition: "transform 0.2s ease",
+                    "&:hover": { transform: "scale(1.05)" },
+                  }}
+                >
+                  <CardContent>
+                    <HomeIcon fontSize="large" sx={{ color: "#2196f3" }} />{" "}
+                    {/* Blue icon */}
+                    <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
+                      Home Decor AI
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#b0bec5" }}>
+                      Upload a photo of your room, and our AI will suggest
+                      personalized decor options to elevate your space.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card
+                  sx={{
+                    backgroundColor: "#1f1f1f",
+                    color: "white",
+                    border: "1px solid #2196f3",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                    transition: "transform 0.2s ease",
+                    "&:hover": { transform: "scale(1.05)" },
+                  }}
+                >
+                  <CardContent>
+                    <CheckCircleOutlineIcon
+                      fontSize="large"
+                      sx={{ color: "#2196f3" }} // Blue icon
+                    />
+                    <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
+                      Task Management
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#b0bec5" }}>
+                      Assign tasks to family members and track progress with our
+                      seamless task management feature.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={4}>
+                <Card
+                  sx={{
+                    backgroundColor: "#1f1f1f",
+                    color: "white",
+                    border: "1px solid #2196f3",
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                    transition: "transform 0.2s ease",
+                    "&:hover": { transform: "scale(1.05)" },
+                  }}
+                >
+                  <CardContent>
+                    <MonetizationOnIcon
+                      fontSize="large"
+                      sx={{ color: "#2196f3" }} // Blue icon
+                    />
+                    <Typography variant="h6" component="h3" sx={{ mb: 1 }}>
+                      Finance Tracker
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: "#b0bec5" }}>
+                      Keep track of your expenses, savings, and budget planning
+                      all in one place with AI assistance.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
             </Grid>
-          </Grid>
+          </section>
+          {/* Divider between sections */}
+          <Divider sx={{ backgroundColor: "#2196f3", margin: "50px 0" }} />{" "}
+          {/* Blue divider */}
+          {/* Pricing Section */}
+          <section id="pricing">
+            <Typography
+              variant="h4"
+              component="h2"
+              gutterBottom
+              sx={{ fontWeight: "bold", textAlign: "center", color: "#2196f3" }} // Blue primary color
+            >
+              Pricing
+            </Typography>
+            <Typography
+              variant="body1"
+              gutterBottom
+              style={{ textAlign: "center", color: "#b0bec5" }}
+            >
+              Choose the plan that fits your needs.
+            </Typography>
+            {/* Add pricing cards here */}
+          </section>
+          {/* Divider between sections */}
+          <Divider sx={{ backgroundColor: "#2196f3", margin: "50px 0" }} />{" "}
+          {/* Blue divider */}
+          {/* Contact Section */}
+          <section id="contact">
+            <Typography
+              variant="h4"
+              component="h2"
+              gutterBottom
+              sx={{ fontWeight: "bold", textAlign: "center", color: "#2196f3" }} // Blue primary color
+            >
+              Contact Us
+            </Typography>
+            <Typography
+              variant="body1"
+              gutterBottom
+              style={{ textAlign: "center", color: "#b0bec5" }}
+            >
+              Have any questions? Reach out to us.
+            </Typography>
+            {/* Add contact form or details */}
+          </section>
         </Container>
-      </HeroSection>
-
-      {/* Features Section */}
-      <FeaturesSection>
-        <Container>
-          <SectionTitle>Features</SectionTitle>
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <FeatureCard whileHover={{ scale: 1.05 }}>
-                <Typography variant="h5">Finance Tracker</Typography>
-                <p>Track income, savings, debt, and expenses with AI-powered insights.</p>
-              </FeatureCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FeatureCard whileHover={{ scale: 1.05 }}>
-                <Typography variant="h5">Task Management</Typography>
-                <p>Assign tasks to family members and manage household efficiently.</p>
-              </FeatureCard>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <FeatureCard whileHover={{ scale: 1.05 }}>
-                <Typography variant="h5">Personalized AI</Typography>
-                <p>Get personalized AI services like home decor, shopping lists, and recipes.</p>
-              </FeatureCard>
-            </Grid>
-          </Grid>
-        </Container>
-      </FeaturesSection>
-
-      {/* Footer */}
-      <Footer>
-        <Typography variant="body2" color="textSecondary">
-          © 2024 Synckin.ai | All Rights Reserved
-        </Typography>
-      </Footer>
-    </div>
+      </div>
+    </>
   );
 };
 
