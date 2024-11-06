@@ -132,7 +132,7 @@ const FamilyDetails = () => {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error adding task",
+        message: "Error adding task - Check your Role (only Parent can Add) / Connectivity",
         type: "error",
       });
     } finally {
@@ -157,7 +157,8 @@ const FamilyDetails = () => {
     } catch (err) {
       setSnackbar({
         open: true,
-        message: "Error adding savings",
+        message:
+          "Error adding savings - Check your Role (only Parent can Add) / Connectivity",
         type: "error",
       });
     }

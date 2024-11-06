@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const FamilyTask = require("../../models/Family Model/FamilyTask");
+const User = require("../../models/User"); // Ensure User model is imported
 
-const verifyToken = (req) => {
+const verifyToken = async (req) => {
   const token = req.headers["x-auth-token"];
   if (!token) {
     console.log("No token");
@@ -11,18 +12,24 @@ const verifyToken = (req) => {
   }
   try {
     const decoded = jwt.verify(token, "yourJWTSecret");
-    return decoded.user.id;
+    const user = await User.findById(decoded.user.id); // Fetch user to get role
+    if (!user) return null;
+    return { userId: user._id, role: user.role }; // Return userId and role
   } catch (err) {
     console.log(err);
     return null;
   }
 };
 
-// Create Task
+// Create Task - Only "Parent" role can assign tasks
 router.post("/tasks", async (req, res) => {
-  const userId = verifyToken(req);
-  if (!userId) {
+  const user = await verifyToken(req);
+  if (!user) {
     return res.status(401).send("Unauthorized");
+  }
+
+  if (user.role !== "Parent") {
+    return res.status(403).send("Only parents can assign tasks.");
   }
 
   const { title, description, dueDate, assignedTo, familyId } = req.body;
@@ -32,7 +39,7 @@ router.post("/tasks", async (req, res) => {
       title,
       description,
       dueDate,
-      assignedBy: userId,
+      assignedBy: user.userId,
       assignedTo,
       familyId,
     });
@@ -44,10 +51,10 @@ router.post("/tasks", async (req, res) => {
   }
 });
 
-// Fetch Tasks
+// Fetch Tasks - No role restriction
 router.get("/tasks/:assignedTo", async (req, res) => {
-  const userId = verifyToken(req);
-  if (!userId) {
+  const user = await verifyToken(req);
+  if (!user) {
     return res.status(401).send("Unauthorized");
   }
 
@@ -65,11 +72,15 @@ router.get("/tasks/:assignedTo", async (req, res) => {
   }
 });
 
-// Update Task
+// Update Task - Only "Parent" role can update tasks
 router.put("/tasks/:id", async (req, res) => {
-  const userId = verifyToken(req);
-  if (!userId) {
+  const user = await verifyToken(req);
+  if (!user) {
     return res.status(401).send("Unauthorized");
+  }
+
+  if (user.role !== "Parent") {
+    return res.status(403).send("Only parents can update tasks.");
   }
 
   const { title, description, dueDate } = req.body;
@@ -87,11 +98,15 @@ router.put("/tasks/:id", async (req, res) => {
   }
 });
 
-// Delete Task
+// Delete Task - Only "Parent" role can delete tasks
 router.delete("/tasks/:id", async (req, res) => {
-  const userId = verifyToken(req);
-  if (!userId) {
+  const user = await verifyToken(req);
+  if (!user) {
     return res.status(401).send("Unauthorized");
+  }
+
+  if (user.role !== "Parent") {
+    return res.status(403).send("Only parents can delete tasks.");
   }
 
   try {
@@ -102,6 +117,5 @@ router.delete("/tasks/:id", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-
 
 module.exports = router;
