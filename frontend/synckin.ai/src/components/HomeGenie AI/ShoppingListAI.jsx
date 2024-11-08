@@ -9,7 +9,7 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
-import { TextField, Typography } from "@mui/material";
+import { TextField, Typography, Box } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ReactMarkdown from "react-markdown";
 
@@ -39,53 +39,76 @@ const ShoppingList = () => {
   };
 
   return (
-    <Container fluid className="p-4" style={{ minHeight: "100vh" }}>
-      <Row className="justify-content-center">
-        <Col xs={12} md={8} lg={6} className="text-center">
-          <div
-            style={{
-              padding: "20px",
-              backgroundColor: "#f8f9fa",
-              borderRadius: "10px",
-              boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
-              maxWidth: "100%",
+    <Container
+      fluid
+      className="d-flex align-items-center justify-content-center"
+      style={{
+        padding: "2rem",
+      }}
+    >
+      <Row className="w-100 justify-content-center">
+        <Col xs={12} md={10} lg={8}>
+          <Box
+            sx={{
+              width: "100%",
+              padding: "2rem",
+              backgroundColor: "#ffffff",
+              borderRadius: "16px",
+              boxShadow: "0 6px 20px rgba(0, 0, 0, 0.15)",
+              textAlign: "center",
             }}
           >
-            <Typography variant="h5" className="mb-4" gutterBottom>
+            <Typography
+              variant="h5"
+              gutterBottom
+              sx={{
+              
+              }}
+            >
               AI Shopping List Generator
             </Typography>
 
             {/* Form Input */}
-            <Form
-              onSubmit={handleSubmit}
-              className="p-3"
-              style={{
-                border: "1px solid #ccc",
-                borderRadius: "8px",
-                marginBottom: "20px",
-              }}
-            >
-              <Form.Group controlId="formInput" className="mb-3">
+            <Form onSubmit={handleSubmit} className="mt-4 mb-4">
+              <Form.Group controlId="formInput" className="mb-4">
                 <TextField
-                  label="Enter Recipe, Meal Plan or Low Items"
+                  label="Enter Recipe, Meal Plan, or Items"
                   variant="outlined"
                   fullWidth
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   required
                   InputProps={{
-                    style: { padding: "12px" },
+                    style: {
+                      padding: "12px",
+                      backgroundColor: "#f9f9f9",
+                      borderRadius: "8px",
+                    },
                   }}
                 />
               </Form.Group>
               <Button
                 type="submit"
                 disabled={loading}
-                className="mb-3 mt-3 btn btn-primary btn-block"
-                fullWidth
+                variant="primary"
+                className="w-100"
+                style={{
+                  padding: "0.75rem",
+                  fontWeight: "bold",
+                  fontSize: "1rem",
+                  borderRadius: "8px",
+                  backgroundColor: "#007bff",
+                  borderColor: "#007bff",
+                  transition: "background-color 0.3s ease",
+                }}
               >
                 {loading ? (
-                  <Spinner animation="border" size="sm" />
+                  <Spinner
+                    as="span"
+                    animation="border"
+                    size="sm"
+                    role="status"
+                  />
                 ) : (
                   "Generate Shopping List"
                 )}
@@ -93,25 +116,39 @@ const ShoppingList = () => {
             </Form>
 
             {/* Error Message */}
-            {error && <Alert variant="danger">{error}</Alert>}
+            {error && (
+              <Alert variant="danger" className="mt-3">
+                {error}
+              </Alert>
+            )}
 
             {/* Generated Shopping List */}
             {shoppingList && (
-              <Alert variant="success" className="mt-3">
-                <Typography variant="h6">Generated Shopping List</Typography>
+              <Alert
+                variant="success"
+                className="mt-4"
+                style={{
+                  padding: "1.5rem",
+                  borderRadius: "12px",
+                  textAlign: "left",
+                }}
+              >
+                <Typography variant="h6" gutterBottom>
+                  Generated Shopping List
+                </Typography>
                 <div
                   style={{
-                    maxHeight: "450px", // Set a max height to prevent overflow
-                    overflowY: "auto", // Add vertical scroll if the content is long
-                    textAlign: "left", // Align the text to the left for better readability
-                    whiteSpace: "pre-wrap", // Preserve whitespace formatting
+                    maxHeight: "400px",
+                    overflowY: "auto",
+                    padding: "0.5rem",
+                    whiteSpace: "pre-wrap",
                   }}
                 >
                   <ReactMarkdown>{shoppingList}</ReactMarkdown>
                 </div>
               </Alert>
             )}
-          </div>
+          </Box>
         </Col>
       </Row>
     </Container>

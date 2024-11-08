@@ -48,7 +48,7 @@ const CreateFamily = () => {
     setSnackbar({ open: false, message: "", type: "" });
 
   return (
-    <div>
+    <div className="text-center mb-3">
       <Button variant="contained" color="primary" onClick={() => setOpen(true)}>
         Create Family
       </Button>

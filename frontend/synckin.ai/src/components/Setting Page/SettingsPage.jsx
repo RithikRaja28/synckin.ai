@@ -10,12 +10,18 @@ import {
   ListItemIcon,
   ListItemText,
   Box,
-  MenuItem
+  MenuItem,
+  Card,
+  CardContent,
+  Typography,
 } from "@mui/material";
 import { Container, Row, Col } from "react-bootstrap";
 import PersonIcon from "@mui/icons-material/Person";
 import PaletteIcon from "@mui/icons-material/Palette";
 import SecurityIcon from "@mui/icons-material/Security";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
 
 const SettingsPage = () => {
   const [profile, setProfile] = useState({
@@ -32,6 +38,7 @@ const SettingsPage = () => {
     currentPassword: "",
     newPassword: "",
   });
+  const [subscription, setSubscription] = useState(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -48,6 +55,7 @@ const SettingsPage = () => {
         setLoading(true);
         const res = await axios.get("http://localhost:5000/auth/user", config);
         setProfile(res.data);
+        setSubscription(res.data.subscription);
       } catch (err) {
         console.error("Error fetching profile", err);
       } finally {
@@ -93,37 +101,6 @@ const SettingsPage = () => {
     }
   };
 
-  const handlePasswordChange = (e) => {
-    setPasswords({ ...passwords, [e.target.name]: e.target.value });
-  };
-
-  const handleSubmitPasswordChange = async (e) => {
-    e.preventDefault();
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) throw new Error("No token found");
-
-      const config = {
-        headers: {
-          "x-auth-token": token,
-        },
-      };
-      setLoading(true);
-      setError("");
-      setSuccess("");
-      await axios.put(
-        "http://localhost:5000/auth/change-password",
-        passwords,
-        config
-      );
-      setSuccess("Password updated successfully!");
-    } catch (err) {
-      setError("Error updating password");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Container fluid className="mt-5">
       <Row>
@@ -159,11 +136,22 @@ const SettingsPage = () => {
               </ListItemIcon>
               <ListItemText primary="Security" />
             </ListItem>
+            <ListItem
+              button
+              selected={activeTab === "subscription"}
+              onClick={() => handleTabClick("subscription")}
+            >
+              <ListItemIcon>
+                <AccessTimeIcon />
+              </ListItemIcon>
+              <ListItemText primary="Subscription" />
+            </ListItem>
           </List>
         </Col>
 
         <Col md={9}>
           <Box p={3}>
+            {/* Profile Section */}
             {activeTab === "profile" && (
               <>
                 <h2>Profile Settings</h2>
@@ -223,6 +211,7 @@ const SettingsPage = () => {
               </>
             )}
 
+            {/* Theme Section */}
             {activeTab === "theme" && (
               <>
                 <h2>Theme Settings</h2>
@@ -287,6 +276,56 @@ const SettingsPage = () => {
                     </Button>
                   </form>
                 )}
+              </>
+            )}
+
+            {/* Subscription Section */}
+            {activeTab === "subscription" && subscription && (
+              <>
+                <h2>Subscription Details</h2>
+                <Card
+                  sx={{
+                    backgroundColor: theme === "dark" ? "#1e1e1e" : "#f4f4f4",
+                    color: theme === "dark" ? "#ffffff" : "#000000",
+                  }}
+                >
+                  <CardContent>
+                    <Box display="flex" alignItems="center" mb={2}>
+                      {subscription.status ? (
+                        <CheckCircleIcon color="success" fontSize="large" />
+                      ) : (
+                        <CancelIcon color="error" fontSize="large" />
+                      )}
+                      <Typography variant="h6" ml={1}>
+                        {subscription.status
+                          ? "Active Subscription"
+                          : "No Active Subscription"}
+                      </Typography>
+                    </Box>
+                    {subscription.status && (
+                      <>
+                        <Box display="flex" alignItems="center" mt={1}>
+                          <AccessTimeIcon color="primary" />
+                          <Typography variant="body1" ml={1}>
+                            Start Date:{" "}
+                            {new Date(
+                              subscription.startDate
+                            ).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                        <Box display="flex" alignItems="center" mt={1}>
+                          <AccessTimeIcon color="secondary" />
+                          <Typography variant="body1" ml={1}>
+                            End Date:{" "}
+                            {new Date(
+                              subscription.endDate
+                            ).toLocaleDateString()}
+                          </Typography>
+                        </Box>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
               </>
             )}
           </Box>

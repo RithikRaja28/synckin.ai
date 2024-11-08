@@ -36,6 +36,7 @@
     "react-scroll-to-bottom": "^4.2.0",
     "react-scrollable-feed": "^2.0.2",
     "react-smooth-dnd": "^0.11.1",
+    "react-typewriter-effect": "^1.1.0",
     "styled-components": "^6.1.13"
   },
   "devDependencies": {
