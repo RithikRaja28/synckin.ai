@@ -108,7 +108,7 @@ const Debt = () => {
         {/* Debt Form */}
         <Grid item xs={12} md={6}>
           <Card elevation={3} sx={{ padding: 3, borderRadius: 3 }}>
-            <Typography variant="h5" gutterBottom>
+            <Typography variant="h5" gutterBottom >
               {isEditing ? "Edit Debt" : "Add Debt"}
             </Typography>
             <form onSubmit={handleSubmit}>

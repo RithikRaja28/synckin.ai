@@ -1,0 +1,8 @@
+@media (max-width: 768px) {
+  .profile-details {
+    text-align: center;
+  }
+  .profile-avatar {
+    margin-bottom: 20px;
+  }
+}

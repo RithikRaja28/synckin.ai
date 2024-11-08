@@ -3,22 +3,33 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const Family = require("../models/Family");
-
+const nodemailer = require("nodemailer");
+const FamilySavings = require("../models/Family Model/FamilySavings");
+const FamilyTask = require("../models/Family Model/FamilyTask");
 // Verify JWT Token
 const verifyToken = (req) => {
-    const token = req.headers["x-auth-token"];
-    if (!token) {
-        console.log("No token");
-        return null;
-    }
-    try {
-        const decoded = jwt.verify(token, "yourJWTSecret");
-        return decoded.user.id;
-    } catch (err) {
-        console.log(err);
-        return null;
-    }
+  const token = req.headers["x-auth-token"];
+  if (!token) {
+    console.log("No token");
+    return null;
+  }
+  try {
+    const decoded = jwt.verify(token, "yourJWTSecret");
+    return decoded.user.id;
+  } catch (err) {
+    console.log(err);
+    return null;
+  }
 };
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: "rithikraja28.rr@gmail.com",
+    pass: "hrzxsykhcmeaaoyb"
+
+  },
+});
 
 router.get("/show", async (req, res) => {
   const userId = verifyToken(req);
@@ -50,6 +61,35 @@ router.get("/show", async (req, res) => {
   }
 });
 
+// Add this route to search users
+router.get("/search", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const { query } = req.query;
+
+  try {
+    if (!query) {
+      return res.status(400).json({ msg: "Search query is required" });
+    }
+
+    // Add debugging logs
+    console.log("Search query:", query);
+
+    const users = await User.find({
+      username: { $regex: query, $options: "i" }, // Case-insensitive search
+      // Adjust based on your schema
+    }).limit(10);
+
+    console.log("Users found:", users); // Check if users are found
+    res.json(users);
+  } catch (err) {
+    console.error("Error searching users:", err.message);
+    res.status(500).send("Server Error");
+  }
+});
 
 
 router.post("/create", async (req, res) => {
@@ -97,7 +137,6 @@ router.post("/create", async (req, res) => {
   }
 });
 
-
 router.post("/add-member", async (req, res) => {
   const userId = verifyToken(req);
   if (!userId) {
@@ -109,7 +148,6 @@ router.post("/add-member", async (req, res) => {
   try {
     const user = await User.findById(userId);
 
-    // Check if the user is a Parent
     if (user.role !== "Parent") {
       return res
         .status(403)
@@ -126,22 +164,154 @@ router.post("/add-member", async (req, res) => {
       return res.status(400).json({ msg: "User is already in a family." });
     }
 
-    // Add member to the family in the User model
-    member.familyId = user.familyId;
-    member.role = role; // Set the role (Parent or Child)
-    await member.save();
+    const inviteToken = jwt.sign(
+      { memberId: member._id, familyId: user.familyId, role },
+      "yourJWTSecret",
+      { expiresIn: "1d" }
+    );
 
-    // Add member to the Family members array
-    const family = await Family.findById(user.familyId);
-    family.members.push({ userId: member._id, role }); // Push to members array
-    await family.save(); // Save the updated Family document
+    const mailOptions = {
+      from:{name:"noreply", address:"rithikraja28.rr@gmail.com"} ,
+      to: member.email,
+      subject: "Family Invitation",
+      html: 
+      `
+    <html>
+    <head>
+      <style>
+        body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          margin: 0;
+          padding: 0;
+          background-color: #f7f9fc;
+        }
+        .container {
+          width: 100%;
+          max-width: 600px;
+          margin: 20px auto;
+          background: #ffffff;
+          padding: 40px;
+          border-radius: 12px;
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+          text-align: center;
+        }
+        .header {
+          background: #0056b3;
+          color: #ffffff;
+          padding: 20px;
+          border-radius: 12px 12px 0 0;
+          font-size: 28px;
+          font-weight: 600;
+        }
+        .content {
+          margin: 20px 0;
+          font-size: 16px;
+          line-height: 1.6;
+          color: #333333;
+        }
+        .button {
+          display: inline-block;
+          padding: 15px 30px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #ffffff;
+          background-color: #007bff;
+          text-decoration: none;
+          border-radius: 30px;
+          text-transform: uppercase;
+          margin: 20px 0;
+          transition: background-color 0.3s ease;
+        }
+        .button:hover {
+          background-color: #0056b3;
+        }
+        .footer {
+          margin-top: 30px;
+          font-size: 14px;
+          color: #999999;
+        }
+        .btn-text {
+          font-weight: 600;
+          text-decoration: none;
+          color: #ffffff;
+          transition: color 0.3s ease;
+        }
+        
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">You're Invited!</div>
+        <div class="content">
+          <p>Hello,</p>
+          <p>You've been invited to join a family on our platform. Click the button below to accept the invitation and get started:</p>
+          <a href="http://localhost:5000/api/family/accept-invitation?token=${inviteToken}" class="button"><span class="btn-text">Accept Invitation</span></a>
+          <p>If you have any questions, please contact us at support@yourplatform.com.</p>
+          <p>Best regards,<br>SyncKin</p>
+        </div>
+        <div class="footer">
+          <p>This is an automated message, please do not reply directly to this email.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `,
+    };
 
-    res.json({ msg: "Member added successfully", member, family });
+
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email:", error);
+        return res.status(500).json({ msg: "Error sending invitation email" });
+      }
+      console.log("Email sent: " + info.response);
+      res.json({
+        msg: "Invitation sent successfully. Please ask the member to check their email.",
+      });
+    });
   } catch (err) {
-    console.error(err.message);
+    console.error("Error in /add-member route:", err.message);
     res.status(500).send("Server error");
   }
 });
+
+
+router.get("/accept-invitation", async (req, res) => {
+  const { token } = req.query; // Get token from query parameters
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, "yourJWTSecret");
+    const { memberId, familyId, role } = decoded;
+
+    const member = await User.findById(memberId);
+
+    if (!member) {
+      return res.status(404).json({ msg: "User not found." });
+    }
+
+    if (member.familyId) {
+      return res.status(400).json({ msg: "User is already in a family." });
+    }
+
+    // Add the member to the family
+    member.familyId = familyId;
+    member.role = role;
+    await member.save();
+
+    const family = await Family.findById(familyId);
+    family.members.push({ userId: member._id, role });
+    await family.save();
+
+    res.json({ msg: "Invitation accepted, and member added to the family." });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: "Error accepting invitation." });
+  }
+});
+
+
 
 router.delete("/delete", async (req, res) => {
   const userId = verifyToken(req);
@@ -182,6 +352,66 @@ router.delete("/delete", async (req, res) => {
   } catch (err) {
     console.error("Error deleting family:", err.message);
     res.status(500).send("Server Error");
+  }
+});
+
+router.delete("/remove-member", async (req, res) => {
+  const userId = verifyToken(req);
+  if (!userId) {
+    return res.status(401).send("Unauthorized");
+  }
+
+  const { _id } = req.body;
+  try {
+    if (!_id) {
+      return res.status(400).json({ msg: "Member ID (_id) is required." });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found." });
+    }
+
+    if (user.role !== "Parent") {
+      return res
+        .status(403)
+        .json({ msg: "Only parents can remove family members." });
+    }
+
+    const family = await Family.findById(user.familyId);
+    if (!family) {
+      return res.status(404).json({ msg: "Family not found." });
+    }
+
+    // Check if the member with the given _id is part of the family
+    const member = family.members.find((m) => m.userId.toString() === _id);
+    if (!member) {
+      return res.status(404).json({ msg: "Member not found in the family." });
+    }
+
+    // Remove member from Family members array
+    family.members = family.members.filter(
+      (m) => m.userId.toString() !== _id.toString()
+    );
+    await family.save();
+
+    // Remove familyId from the member
+    const memberUser = await User.findById(_id);
+    if (memberUser) {
+      memberUser.familyId = null;
+      await memberUser.save();
+    }
+
+    // Remove all tasks assigned to this member
+    await FamilyTask.deleteMany({ assignedTo: _id });
+
+    // Remove all savings associated with this member
+    await FamilySavings.deleteMany({ assignedTo: _id });
+
+    res.json({ msg: "Member, their tasks, and savings removed successfully" });
+  } catch (err) {
+    console.error("Error removing member:", err.message);
+    res.status(500).send("Server error");
   }
 });
 

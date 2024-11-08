@@ -6,20 +6,33 @@ import "./Dashboard.css";
 import { AuthContext } from "../../context/AuthContext";
 import InventoryManager from "../InventoryManagement/InventorySystem";
 import TaskManager from "../TaskManagement/TaskManager";
-import IncomePage from "../Finance Tracker/IncomePage";
 import FinanceTracker from "../Finance Tracker/FinanceTracker";
 import IncomeChart from "../Finance Tracker/utils/IncomeChart";
 import DebtChart from "../Finance Tracker/utils/DebtChart"; // Import the DebtChart
 import axios from "axios";
 import SavingsChart from "../Finance Tracker/utils/SavingsChart";
 import FamilyConnect from "../Family Connect/FamilyConnect";
+import { Grid, Paper } from "@mui/material"; // Import Grid for layout
+import DashboardCard from "./utils/DashboardCard";
+import ProfileDashboard from "../Profile/ProfileDashboard";
+import SettingsPage from "../Setting Page/SettingsPage";
+import ExpenseChart from "../Finance Tracker/utils/ExpenseChart";
+import BudgetList from "../Finance Tracker/Budget Tracker/BudgetList";
+import HomeGenie from "../HomeGenie AI/HomeGenie";
+import { Container, Row, Col, Card } from "react-bootstrap";
+import { Typography, Box } from "@mui/material";
+import { styled } from "@mui/system";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { auth } = useContext(AuthContext);
   const [incomes, setIncomes] = useState([]);
   const [debts, setDebts] = useState([]); // State for debts
-   const [savings, setSavings] = useState([]);
+  const [savings, setSavings] = useState([]);
+  const [expense, setExpense]= useState([]);
+  const [showProfile, setShowProfile] = useState(false); // Track profile page
 
   useEffect(() => {
     if (!auth.isAuthenticated) {
@@ -58,20 +71,56 @@ const Dashboard = () => {
       );
   }, []);
 
+  useEffect(() => {
+    // Fetch savings data for the chart
+    axios
+      .get("http://localhost:5000/api/savings/show", {
+        headers: { "x-auth-token": localStorage.getItem("token") },
+      })
+      .then((response) => {
+        const savingsData = Array.isArray(response.data) ? response.data : [];
+        setSavings(savingsData);
+      })
+      .catch((error) =>
+        console.error("There was an error fetching the savings!", error)
+      );
+  }, []);
+
    useEffect(() => {
-     // Fetch savings data for the chart
+     // Fetch income data for the chart
      axios
-       .get("http://localhost:5000/api/savings/show", {
+       .get("http://localhost:5000/api/expense/show", {
          headers: { "x-auth-token": localStorage.getItem("token") },
        })
        .then((response) => {
-         const savingsData = Array.isArray(response.data) ? response.data : [];
-         setSavings(savingsData);
+         const expenseData = Array.isArray(response.data) ? response.data : [];
+         setExpense(expenseData);
        })
        .catch((error) =>
-         console.error("There was an error fetching the savings!", error)
+         console.error("There was an error fetching the incomes!", error)
        );
    }, []);
+
+  // Handler to switch between main dashboard and profile
+  const handleProfileClick = () => {
+    setShowProfile(true); // Show profile dashboard
+  };
+
+  const StyledDashboard = styled(Box)(({ theme }) => ({
+  padding: theme.spacing(4),
+  backgroundColor: '#f5f5f5',
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+}));
+
+// Custom card styling
+const StyledCard = styled(Card)(({ theme }) => ({
+  padding: theme.spacing(3),
+  borderRadius: '15px',
+  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+}));
 
   return (
     <div className="d-flex vh-100 w-100">
@@ -83,35 +132,78 @@ const Dashboard = () => {
           transition: "margin-left 0.3s ease-in-out",
         }}
       >
-        <Header />
+        <Header onProfileClick={handleProfileClick} /> {/* Pass handler here */}
         <div className="content p-4">
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <div>
-                  <h1>Welcome to the Dashboard</h1>
-                  {auth.user && <p>Hello, {auth.user.username}</p>}
-                  {/* Grid Layout for Income and Debt Charts */}
-                  <div className="dashboard-grid">
-                    <div className="chart-item">
-                      <IncomeChart incomes={incomes} />
-                    </div>
-                    <div className="chart-item">
-                      <DebtChart debts={debts} />
-                    </div>
+          {showProfile ? (
+            // Conditionally render ProfileDashboard
+            <ProfileDashboard />
+          ) : (
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <div>
+                    <h1>Welcome to the Dashboard</h1>
+                    {auth.user && <p>Hello, {auth.user.username}</p>}
+
+                    {/* Responsive Grid Layout for the Charts */}
+                    <Grid container spacing={3}>
+                      {/* Income Chart (Left) */}
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <IncomeChart incomes={incomes} />
+                        </Paper>
+                      </Grid>
+
+                      {/* Debt Chart (Right) */}
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <DebtChart debts={debts} />
+                        </Paper>
+                      </Grid>
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <DashboardCard />
+                        </Paper>
+                      </Grid>
+                      {/* Savings Chart (Full width below) */}
+                      <Grid item xs={12}>
+                        <Paper elevation={3} sx={{ padding: 2 }}>
+                          <SavingsChart savings={savings} />
+                        </Paper>
+                      </Grid>
+
+                      <Grid item xs={12} md={4}>
+                        <Paper
+                          elevation={3}
+                          sx={{ padding: 2, height: "100%" }}
+                        >
+                          <ExpenseChart expenses={expense} />
+                        </Paper>
+                      </Grid>
+                    </Grid>
                   </div>
-                    <div className="chart-item">
-                      <SavingsChart savings={savings} />
-                    </div>
-                </div>
-              }
-            />
-            <Route path="/inventorytracker" element={<InventoryManager />} />
-            <Route path="/taskmanager" element={<TaskManager />} />
-            <Route path="/financetracker" element={<FinanceTracker />} />
-            <Route path="/family" element={<FamilyConnect />} />
-          </Routes>
+                }
+              />
+              <Route path="/inventorytracker" element={<InventoryManager />} />
+              <Route path="/taskmanager" element={<TaskManager />} />
+              <Route path="/financetracker" element={<FinanceTracker />} />
+              <Route path="/family" element={<FamilyConnect />} />
+              <Route path="/profile" element={<ProfileDashboard />} />
+              <Route path="/budget-planning" element={<BudgetList />} />
+              <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/homegenieAI" element={<HomeGenie />} />
+            </Routes>
+          )}
         </div>
       </div>
     </div>

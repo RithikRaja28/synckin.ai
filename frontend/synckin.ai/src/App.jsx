@@ -5,6 +5,9 @@ import { AuthProvider, AuthContext } from "./context/AuthContext.jsx"; // Import
 import Login from "./components/Authentication/Login.jsx";
 import Signup from "./components/Authentication/SignUp.jsx";
 import Dashboard from "./components/Dashboard/Dashboard.jsx";
+import ProfileDashboard from "./components/Profile/ProfileDashboard.jsx";
+import LandingPage from "./components/LandingPage/LandingPage.jsx";
+import PaymentSuccess from "./components/Subscription/Payment.jsx";
 
 // Create a PrivateRoute component to handle authentication
 const PrivateRoute = ({ component: Component }) => {
@@ -21,9 +24,12 @@ const App = () => {
           path="/dashboard/*"
           element={<PrivateRoute component={Dashboard} />} // Pass Dashboard as a reference
         />
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Signup />} />
+        <Route path="/landingpage" element={<LandingPage />} />
         <Route path="*" element={<Navigate to="/login" />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
       </Routes>
     </AuthProvider>
   );

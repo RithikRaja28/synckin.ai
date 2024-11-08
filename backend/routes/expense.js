@@ -26,7 +26,7 @@ router.post("/add", async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 
-  const { category, subcategory, amount, description } = req.body;
+  const { category, subcategory, amount, description, date } = req.body;
 
   try {
     const newExpense = new Expense({
@@ -34,6 +34,7 @@ router.post("/add", async (req, res) => {
       subcategory,
       amount,
       description,
+      date,
       userId,
     });
 
@@ -68,7 +69,7 @@ router.put("/update/:id", async (req, res) => {
     return res.status(401).send("Unauthorized");
   }
 
-  const { category, subcategory, amount, description } = req.body;
+  const { category, subcategory, amount, description, date } = req.body;
 
   try {
     let expense = await Expense.findOne({ _id: req.params.id, userId });
@@ -80,6 +81,7 @@ router.put("/update/:id", async (req, res) => {
     expense.subcategory = subcategory || expense.subcategory;
     expense.amount = amount !== undefined ? amount : expense.amount;
     expense.description = description || expense.description;
+    expense.date = date || expense.date;
 
     const updatedExpense = await expense.save();
     res.json(updatedExpense);

@@ -10,8 +10,10 @@ import {
   FaBell,
   FaBars,
   FaCalendar,
+  FaCommentDollar,
 } from "react-icons/fa";
 import { NavLink, useLocation } from "react-router-dom";
+import { AiFillOpenAI } from "react-icons/ai";
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -118,6 +120,16 @@ const Sidebar = () => {
             }`}
           >
             <FaUser className="me-2" /> Family Members
+          </NavLink>
+          <NavLink
+            to="/dashboard/homegenieAI"
+            className={`nav-link ${
+              location.pathname === "/dashboard/homegenieAI"
+                ? "text-info active"
+                : "text-light"
+            }`}
+          >
+            <AiFillOpenAI className="me-2" /> HomeGenie AI
           </NavLink>
           <NavLink
             to="/dashboard/settings"

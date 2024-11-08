@@ -1,11 +1,3 @@
-/* Dashboard.css */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr; /* 2 equal columns */
-  grid-gap: 20px; /* Space between the grid items */
-  margin-top: 20px;
-}
-
 .chart-item {
   background-color: #fff;
   border-radius: 10px;
@@ -13,7 +5,20 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* For screens smaller than 992px */
+.dashboard-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Make it responsive */
+  grid-gap: 20px; /* Add space between the charts */
+  margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  /* On smaller screens, the grid will collapse to one column */
+  .dashboard-charts {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 992px) {
   .nav-ai {
     margin-left: 0 !important;
@@ -28,7 +33,6 @@
   }
 }
 
-/* For screens larger than 992px */
 @media (min-width: 992px) {
   .sidebar {
     width: 250px;

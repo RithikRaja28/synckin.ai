@@ -11,7 +11,6 @@ import {
   Legend,
 } from "chart.js";
 
-// Register chart components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -46,6 +45,7 @@ const SavingsChart = ({ savings }) => {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: true,
@@ -55,20 +55,6 @@ const SavingsChart = ({ savings }) => {
             size: 14,
           },
         },
-      },
-      tooltip: {
-        backgroundColor: "rgba(0,0,0,0.7)",
-        titleFont: {
-          size: 14,
-        },
-        bodyFont: {
-          size: 12,
-        },
-        footerFont: {
-          size: 10,
-        },
-        padding: 10,
-        displayColors: true,
       },
     },
     scales: {
@@ -103,7 +89,7 @@ const SavingsChart = ({ savings }) => {
   return (
     <Card sx={{ mt: 4, p: 2, boxShadow: 3, borderRadius: 3 }}>
       <CardContent>
-        <Box sx={{ height: 400 }}>
+        <Box sx={{ height: { xs: "250px", sm: "400px" } }}>
           <Bar data={chartData} options={options} />
         </Box>
       </CardContent>
